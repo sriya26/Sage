@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sage | Start Your Journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="journey.css">
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">Sage</h1>
+
+    <div id="entries-container" class="hidden"></div>
+
+    <div id="default-section">
+      <img src="../assets/meditation.PNG" alt="Meditating woman" class="main-image" />
+      <h2 class="subtitle">Start your journey</h2>
+    </div>
+  </div>
+
+  <div class="chatbot-button" title="chatbot">
+    <img src="../assets/chatbot-icon.png" alt="Chatbot" class="chatbot-icon" onclick="toggleModal()">
+  </div>
+
+  <div class="bottom-nav">
+    <a href="journey.html" title="Home">
+      <img src="../assets/home-icon.PNG" alt="Home" class="nav-icon">
+    </a>
+
+    <a href="https://open.spotify.com/playlist/2pf4W9bfzSnbxqjaXEQUQy" target="_blank" rel="noopener noreferrer" title="Playlist">
+      <img src="../assets/headphones-icon.PNG" alt="Audio" class="nav-icon">
+    </a>
+
+    <a href="../journal/journal.html" title="Journal">
+      <img src="../assets/book-icon.PNG" alt="Journal" class="nav-icon">
+    </a>
+  </div>
+
+  <div class="chatbot-modal" id="chatbotModal">
+    <div class="chatbot-header">
+      <span>Sage–bot</span>
+      <button class="close-btn" onclick="toggleModal()">×</button>
+    </div>
+
+    <div class="chatbot-body" id="chatbotBody"></div>
+
+    <div class="chatbot-input-area">
+      <input type="text" id="chatInput" placeholder="Enter your message here" />
+      <img src="../assets/send.PNG" alt="Send" class="send-icon" id="send-icon" onclick="sendMessage()">
+    </div>
+  </div>
+
+  <script src="chatbot.js"></script>
+  <script src="journey.js"></script>
+</body>
+</html>

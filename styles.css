@@ -1,0 +1,165 @@
+@font-face {
+  font-family: 'Chloe';
+  src: url('fonts/Chloe-Regular.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #c0e8df;
+  overflow-x: hidden;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  text-align: center;
+  padding-top: 20px;
+  position: relative;
+}
+
+.title {
+  font-size: 70px;
+  font-weight: normal;
+  color: #ffffff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Chloe', serif;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: #20415b;
+  margin-top: 0.5em;
+  letter-spacing: 1px;
+}
+
+.login-box {
+  margin-top: 15px;
+  background-color: white;
+  padding: 40px;
+  border-radius: 12px;
+  border: 2px solid #254e72;
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1;
+  position: relative;
+}
+
+.login-box h2 {
+  margin-bottom: 20px;
+  font-size: 28px;
+  color: #000000;
+}
+
+.input-field {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.join-button {
+  background-color: #1b426b;
+  color: white;
+  padding: 12px 24px;
+  font-size: 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.join-button:hover {
+  background-color: #13314d;
+}
+
+.auth-box p {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+.auth-box p a {
+  color: #6c63ff;
+  text-decoration: none;
+}
+
+.auth-box p a:hover {
+  text-decoration: underline;
+}
+
+.hidden {
+  display: none;
+}
+
+.image-strip {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.bottom-image {
+  width: 100%;
+  height: 100px;
+  object-fit: contain;
+}
+
+.bottom-image.left {
+  left: 0;
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
+  z-index: 0;
+}
+
+.bottom-image.right {
+  right: 0;
+  width: 50%;
+  height: 50%;
+  object-fit: contain;
+  z-index: 0;
+  transform: scaleX(-1);
+}
+
+/* Add this to styles.css */
+.message-box {
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  display: none;
+  font-size: 16px;
+}
+
+.message-box.show {
+  display: block;
+}
+
+.message-box.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 2px solid #c3e6cb;
+}
+
+.message-box.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 2px solid #f5c6cb;
+}
+
+.message-box.analysing {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 2px solid #ffeeba;
+}

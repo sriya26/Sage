@@ -1,0 +1,362 @@
+@font-face {
+  font-family: 'Chloe';
+  src: url('../fonts/Chloe-Regular.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: #ffffff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 20px;
+}
+
+.title {
+  font-size: 70px;
+  font-weight: normal; /* Remove boldness */
+  color: #254e72;
+  margin-bottom: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-family: 'Chloe', serif;
+}
+
+.main-image {
+  max-width: 300px;
+  width: 80%;
+  height: auto;
+}
+
+.subtitle {
+  font-size: 24px;
+  color: #254e72;
+  font-style: italic;
+  margin-top: 20px;
+}
+
+.bottom-nav {
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 0;
+  border-top: 1px solid #ddd;
+}
+
+.nav-icon {
+  height: 50px;
+  width: 60px;
+}
+
+.chatbot-button {
+  position: fixed;
+  bottom: 80px; /* slightly above bottom nav */
+  right: 20px;  /* aligned to the right */
+  z-index: 1000;
+}
+
+.chatbot-icon {
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  border-radius: 50%;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.chatbot-icon:hover {
+  transform: scale(1.1);
+}
+
+/* Chatbot Modal Styles */
+.chatbot-modal {
+  display: none;
+  position: fixed;
+  bottom: 150px;  /* So it opens just above the chatbot icon */
+  right: 30px;
+  width: 320px;
+  height: 480px;
+  background: white;
+  border: 2px solid #254e72;
+  border-radius: 20px;
+  box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  flex-direction: column;
+  font-family: 'Montserrat', sans-serif;
+  overflow: hidden;
+}
+
+/* Header */
+.chatbot-header {
+  background-color: #254e72;
+  color: #c0e8df;
+  padding: 14px 18px;
+  font-size: 25px;
+  font-weight: normal;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'Chloe', serif;
+}
+
+/* Close Button */
+.close-btn {
+  background: none;
+  border: none;
+  color: #c0e8df;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* Chat Body */
+.chatbot-body {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+}
+
+/* Input area */
+.chatbot-input-area {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-top: 1px solid #ccc;
+  background: #f9f9f9;
+  position: sticky; /*eeps the input bar fixed inside the modal*/
+  bottom: 0;
+}
+
+.chatbot-input-area input {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 20px;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 14px;
+  outline: none;
+}
+
+.send-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+/* Chat bubbles */
+.bot-message, .user-message {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  position: relative;
+  word-wrap: break-word;
+  line-height: 1.4;
+  align-self: flex-start;
+  text-align: left;
+}
+
+.user-message {
+  background-color: #e6f0f3;
+  align-self: flex-end;
+  color: #000;
+  border-top-right-radius: 0;
+}
+
+.bot-message {
+  background-color: #c0e8df;
+  align-self: flex-start;
+  color: #000;
+  border-top-left-radius: 0;
+}
+
+.journey-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px;
+}
+
+.entries-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* Align children (entry-box) to the left */
+}
+
+.entry-box {
+  border: 2px solid #1b426b;
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 0;
+  align-self: flex-start; /* Ensure each box is left-aligned */
+}
+
+.entry-preview {
+  max-width: 70%;
+  color: #1b426b;
+  font-size: 18px;
+}
+
+.emotion-badge {
+  border-radius: 12px;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+.illustration {
+    flex: 1;
+    text-align: center;
+}
+
+.illustration img {
+    max-width: 250px;
+    height: auto;
+}
+
+.caption {
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    color: #1e3a5f;
+    font-style: italic;
+}
+
+.emotion-joy {
+  background-color: #7ddc7a; /* green */
+}
+
+.emotion-sadness {
+  background-color: #f39c12; /* orange */
+}
+
+.emotion-anger {
+  background-color: #e74c3c; /* red */
+}
+
+.emotion-surprise {
+  background-color: #f1c40f; /* yellow */
+}
+
+.default-section {
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+/* .container {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 3rem;
+  gap: 2rem;
+  flex-wrap: wrap;
+} */
+
+.entry-card {
+  border: 3px solid #1e3a5f;
+  border-radius: 25px;
+  padding: 1.5rem;
+  background-color: #fff;
+  max-width: 600px;
+  position: relative;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.entry-date {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #1e3a5f;
+}
+
+.entry-text {
+  font-size: 1rem;
+  margin-top: 0.5rem;
+  color: #1e3a5f;
+}
+
+.emotion-tag {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  color: white;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  font-weight: bold;
+}
+/* NEW FLEX LAYOUT FOR ENTRIES + ILLUSTRATION SIDE BY SIDE */
+.entries-illustration-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 30px;
+}
+
+.entries-wrapper {
+  flex: 1 1 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.illustration-right {
+  flex: 1 1 40%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.illustration-right img {
+  max-width: 250px;
+  height: auto;
+}
+
+.illustration-right .caption {
+  font-size: 1.2rem;
+  margin-top: 1rem;
+  color: #1e3a5f;
+  font-style: italic;
+}
+.option-button {
+  margin: 8px 6px 0;
+  padding: 10px 16px;
+  background-color: #254e72;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-block;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.option-button:hover {
+  background-color: #1a3853;
+}

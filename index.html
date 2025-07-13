@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sage | One Place to Set Your State</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="title">Sage</div>
+    <div class="subtitle">ONE PLACE TO SET YOUR STATE</div>
+
+    <div id="message-box" class="message-box"></div><!--for incorrect submissions-->
+
+    <div class="login-box" id="auth-box">
+      <h2 id="form-title">Welcome Back!</h2>
+
+      <div id="login-form">
+        <input type="email" placeholder="Email" class="input-field" id="login-email"/>
+        <input type="password" placeholder="Password" class="input-field" id="login-password"/>
+        <button class="join-button" id="login-button">Login</button>
+        <p>Not a user? <a href="#" id="show-signup">Register here</a></p>
+      </div>
+
+      <div id="signup-form" class="hidden">
+        <input type="text" placeholder="Name" class="input-field" id="signup-name"/>
+        <input type="email" placeholder="Email" class="input-field" id="signup-email"/>
+        <input type="password" placeholder="Password" class="input-field" id="signup-password"/>
+        <select id="signup-gender" class="input-field">
+          <option value="">Select Gender</option>
+          <option value="Female">Female</option>
+          <option value="Male">Male</option>
+          <option value="Other">Other</option>
+        </select>
+        <div style="margin-bottom:20px; text-align:left;">
+          <label for="signup-picture" style="margin-right:10px;">Upload Picture:</label>
+          <input type="file" id="signup-picture" />
+        </div>
+
+        <button class="join-button" id="signup-button">Sign Up</button>
+        <p>Already a user? <a href="#" id="show-login">Back to login</a></p>
+      </div>
+    </div>
+
+    <div class="image-strip">
+      <img src="/assets/login1.PNG" alt="Left Decoration" class="bottom-image left" />
+      <img src="assets/login1.PNG" alt="Right Decoration" class="bottom-image right" />
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>
