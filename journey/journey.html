@@ -13,6 +13,22 @@
 
     <div id="entries-container" class="hidden"></div>
 
+    <div id="weekly-report-section" class="hidden">
+      <h2 class="chart-title">Week in Review</h2>
+      <div class="report-card">
+        <p id="report-summary" class="report-summary"></p>
+        <div id="report-bars" class="report-bars"></div>
+      </div>
+    </div>
+
+    <div id="mood-chart-section" class="hidden">
+      <h2 class="chart-title">Your Mood — Last 30 Days</h2>
+      <div class="chart-wrapper">
+        <canvas id="moodChart"></canvas>
+      </div>
+      <div id="mood-legend" class="mood-legend"></div>
+    </div>
+
     <div id="default-section">
       <img src="../assets/meditation.PNG" alt="Meditating woman" class="main-image" />
       <h2 class="subtitle">Start your journey</h2>
@@ -24,16 +40,31 @@
   </div>
 
   <div class="bottom-nav">
-    <a href="journey.html" title="Home">
-      <img src="../assets/home-icon.PNG" alt="Home" class="nav-icon">
+    <a href="journey.html" class="nav-item" title="Home">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 12 12 3 21 12"/>
+        <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+      </svg>
+      <span class="nav-label">Home</span>
     </a>
 
-    <a href="https://open.spotify.com/playlist/2pf4W9bfzSnbxqjaXEQUQy" target="_blank" rel="noopener noreferrer" title="Playlist">
-      <img src="../assets/headphones-icon.PNG" alt="Audio" class="nav-icon">
+    <a href="https://open.spotify.com/playlist/2pf4W9bfzSnbxqjaXEQUQy" target="_blank" rel="noopener noreferrer" class="nav-item" title="Playlist">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 18v-6a9 9 0 0118 0v6"/>
+        <path d="M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3v5z"/>
+        <path d="M21 18a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3v5z"/>
+      </svg>
+      <span class="nav-label">Music</span>
     </a>
 
-    <a href="../journal/journal.html" title="Journal">
-      <img src="../assets/book-icon.PNG" alt="Journal" class="nav-icon">
+    <a href="../journal/journal.html" class="nav-item" title="Journal">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        <line x1="9" y1="7" x2="15" y2="7"/>
+        <line x1="9" y1="11" x2="15" y2="11"/>
+      </svg>
+      <span class="nav-label">Journal</span>
     </a>
   </div>
 
@@ -51,6 +82,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="chatbot.js"></script>
   <script src="journey.js"></script>
 </body>

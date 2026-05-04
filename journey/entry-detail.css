@@ -1,0 +1,100 @@
+@font-face {
+  font-family: 'Chloe';
+  src: url('../fonts/Chloe-Regular.otf') format('opentype');
+}
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background-color: white;
+  position: relative;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.container {
+  text-align: center;
+  padding: 40px 20px 120px;
+  position: relative;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+.title {
+  font-family: 'Chloe', serif;
+  font-size: 32px;
+  color: #254e72;
+  margin-bottom: 12px;
+}
+
+.emotion-row {
+  margin-bottom: 24px;
+}
+
+.emotion-badge {
+  display: inline-block;
+  border-radius: 12px;
+  padding: 8px 22px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #fff;
+  text-transform: capitalize;
+}
+
+.emotion-badge.emotion-joy      { background-color: #7ddc7a; }
+.emotion-badge.emotion-sadness  { background-color: #f39c12; }
+.emotion-badge.emotion-anger,
+.emotion-badge.emotion-fear     { background-color: #e74c3c; }
+.emotion-badge.emotion-surprise { background-color: #f1c40f; }
+.emotion-badge.emotion-disgust  { background-color: #e67e22; }
+.emotion-badge.emotion-neutral  { background-color: #90b4ce; }
+.emotion-badge.emotion-unknown  { background-color: #ccc; }
+
+.entry-box {
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto;
+  background: white;
+  border: 2px solid #254e72;
+  border-radius: 20px;
+  padding: 28px 32px;
+  box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+#entry-text {
+  font-size: 16px;
+  color: #254e72;
+  line-height: 1.8;
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.decor-left {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 180px;
+  z-index: -1;
+}
+
+.decor-right {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 400px;
+  z-index: -1;
+}
+
+.home-link {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.home-icon {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}

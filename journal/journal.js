@@ -24,6 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
     const formattedDate = today.toLocaleDateString(undefined, options);
     dateHeading.textContent = formattedDate + " entry";
+    const isoDate = today.toISOString().slice(0, 10);
 
     // Submit handler
     submitBtn.addEventListener("click", function (e) {
@@ -41,12 +42,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
         analysing.classList.add("show");
 
-        fetch("http://localhost:5000/submit_journal", {
+        fetch("http://localhost:5001/submit_journal", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 entry: entry,
-                date: formattedDate,
+                date: isoDate,
                 email: userEmail
             })
         })

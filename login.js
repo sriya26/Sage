@@ -40,7 +40,7 @@ loginButton.addEventListener('click', function() {
     return;
   }
 
-  fetch('http://localhost:5000/login', {
+  fetch('http://localhost:5001/login', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({ email, password })
@@ -85,7 +85,7 @@ signupButton.addEventListener('click', function() {
 
   showMessage('Submitting your details...', 'analysing');
 
-  fetch('http://localhost:5000/signup', {
+  fetch('http://localhost:5001/signup', {
     method: 'POST',
     body: formData
   })

@@ -56,7 +56,7 @@ function sendMessage(message, isWelcome = false) {
 
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  fetch('http://localhost:5000/dialogflow', {
+  fetch('http://localhost:5001/dialogflow', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ message: message })
