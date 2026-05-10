@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sage | Profile</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,500&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="stylesheet" href="profile.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1 class="title">Sage</h1>
+
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="avatar" id="avatar"></div>
+      <h2 class="profile-name" id="profile-name"></h2>
+      <p class="profile-email" id="profile-email"></p>
+      <span class="gender-badge" id="profile-gender"></span>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        </svg>
+        <span class="stat-value" id="stat-total">—</span>
+        <span class="stat-label">Total Entries</span>
+      </div>
+      <div class="stat-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+        </svg>
+        <span class="stat-value" id="stat-month">—</span>
+        <span class="stat-label">This Month</span>
+      </div>
+      <div class="stat-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2c0 6-6 8-6 13a6 6 0 0012 0c0-5-6-7-6-13z"/><path d="M12 12c0 3-2 4-2 6a2 2 0 004 0c0-2-2-3-2-6z" fill="#c0e8df" stroke="none"/>
+        </svg>
+        <span class="stat-value" id="stat-streak">—</span>
+        <span class="stat-label">Day Streak</span>
+      </div>
+      <div class="stat-card">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>
+        </svg>
+        <span class="stat-value emotion-value" id="stat-emotion">—</span>
+        <span class="stat-label">Top Emotion</span>
+      </div>
+    </div>
+
+    <!-- Emotion donut -->
+    <div class="section-card">
+      <h3 class="section-title">Mood Breakdown</h3>
+      <div class="donut-wrapper">
+        <canvas id="emotionDonut"></canvas>
+      </div>
+    </div>
+
+    <!-- Recent entries -->
+    <div class="section-card">
+      <h3 class="section-title">Recent Entries</h3>
+      <div id="recent-entries"></div>
+    </div>
+
+  </div>
+
+  <!-- Bottom nav -->
+  <div class="bottom-nav">
+    <a href="../journey/journey.html" class="nav-item" title="Home">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="3 12 12 3 21 12"/>
+        <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
+      </svg>
+      <span class="nav-label">Home</span>
+    </a>
+    <a href="https://open.spotify.com/playlist/2pf4W9bfzSnbxqjaXEQUQy" target="_blank" rel="noopener noreferrer" class="nav-item" title="Playlist">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 18v-6a9 9 0 0118 0v6"/>
+        <path d="M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3v5z"/>
+        <path d="M21 18a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3v5z"/>
+      </svg>
+      <span class="nav-label">Music</span>
+    </a>
+    <a href="../journal/journal.html" class="nav-item" title="Journal">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+        <line x1="9" y1="7" x2="15" y2="7"/>
+        <line x1="9" y1="11" x2="15" y2="11"/>
+      </svg>
+      <span class="nav-label">Journal</span>
+    </a>
+    <a href="profile.html" class="nav-item nav-item--active" title="Profile">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="8" r="4"/>
+        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      <span class="nav-label nav-label--active">Profile</span>
+    </a>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="profile.js"></script>
+</body>
+</html>

@@ -1,3 +1,4 @@
+const SESSION_ID = 'sage-' + Date.now();
 let welcomeShown = false;
 
 function toggleModal() {
@@ -10,117 +11,198 @@ function toggleModal() {
   } else {
     modal.classList.add("show");
     modal.style.display = "flex";
-
     if (!welcomeShown) {
-      sendMessage("hi", true); // triggers Default Welcome Intent
+      showWelcome();
       welcomeShown = true;
     }
   }
 }
 
-// Handle Enter key to send message
+function showWelcome() {
+  appendBotMessage(
+    "Hi, I'm Sage 🌿 I'm here to listen and support you. How are you feeling today?",
+    false
+  );
+  showChips([
+    { label: "😔 Feeling sad",     action: 'send', value: "I'm feeling sad" },
+    { label: "😰 Feeling anxious", action: 'send', value: "I'm feeling anxious" },
+    { label: "😊 Feeling good",    action: 'send', value: "I'm feeling good" },
+  ]);
+}
+
+// ── Message helpers ────────────────────────────────────────────────────────
+
+function appendBotMessage(text, animate = true) {
+  const chatBody = document.getElementById("chatbotBody");
+
+  const row = document.createElement("div");
+  row.className = "bot-message-row";
+
+  const avatar = document.createElement("span");
+  avatar.className = "bot-avatar";
+  avatar.textContent = "🌿";
+
+  const bubble = document.createElement("div");
+  bubble.className = "bot-message";
+
+  row.appendChild(avatar);
+  row.appendChild(bubble);
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+
+  if (animate) {
+    typewriter(bubble, text);
+  } else {
+    bubble.textContent = text;
+  }
+
+  return { bubble, length: text.length };
+}
+
+function typewriter(el, text, speed = 16) {
+  const chatBody = document.getElementById("chatbotBody");
+  let i = 0;
+  const tick = setInterval(() => {
+    el.textContent += text[i++];
+    chatBody.scrollTop = chatBody.scrollHeight;
+    if (i >= text.length) clearInterval(tick);
+  }, speed);
+}
+
+function showTypingIndicator() {
+  const chatBody = document.getElementById("chatbotBody");
+  const row = document.createElement("div");
+  row.className = "bot-message-row";
+  row.id = "typing-row";
+
+  const avatar = document.createElement("span");
+  avatar.className = "bot-avatar";
+  avatar.textContent = "🌿";
+
+  const indicator = document.createElement("div");
+  indicator.className = "bot-message typing-indicator";
+  indicator.innerHTML = "<span></span><span></span><span></span>";
+
+  row.appendChild(avatar);
+  row.appendChild(indicator);
+  chatBody.appendChild(row);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function hideTypingIndicator() {
+  const row = document.getElementById("typing-row");
+  if (row) row.remove();
+}
+
+// ── Chips ──────────────────────────────────────────────────────────────────
+
+function showChips(chips) {
+  const chatBody = document.getElementById("chatbotBody");
+  const container = document.createElement("div");
+  container.className = "chat-chips";
+
+  chips.forEach(chip => {
+    const btn = document.createElement("button");
+    btn.textContent = chip.label;
+    btn.className = chip.action === 'open' ? "chip chip-resource" : "chip";
+    btn.onclick = () => {
+      document.querySelectorAll(".chat-chips").forEach(c => c.remove());
+      if (chip.action === 'open') {
+        window.open(chip.value, "_blank");
+      } else {
+        sendMessage(chip.value);
+      }
+    };
+    container.appendChild(btn);
+  });
+
+  chatBody.appendChild(container);
+  chatBody.scrollTop = chatBody.scrollHeight;
+}
+
+function chipsForEmotion(type) {
+  if (type === 'sad') return [
+    { label: "Tell me more 💬",      action: 'send', value: "I'd like to talk more about how I'm feeling" },
+    { label: "Calming Music 🎵",     action: 'open', value: "https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO" },
+    { label: "Uplifting Video 🎥",   action: 'open', value: "https://www.youtube.com/watch?v=ZRI1k4kYmlI" },
+  ];
+  if (type === 'anxious') return [
+    { label: "Help me calm down 🌬️", action: 'send', value: "Can you help me calm down right now?" },
+    { label: "Breathing Exercise 🧘",action: 'open', value: "https://www.youtube.com/watch?v=nmFUDkj1Aq0" },
+    { label: "Grounding Tips 📚",    action: 'open', value: "https://www.healthline.com/health/grounding-techniques" },
+  ];
+  if (type === 'happy') return [
+    { label: "Keep this going 🌟",   action: 'send', value: "How can I maintain this positive feeling?" },
+    { label: "Journal it ✍",         action: 'open', value: "../journal/journal.html" },
+    { label: "Upbeat Music 🎶",      action: 'open', value: "https://www.youtube.com/watch?v=ZbZSe6N_BXs" },
+  ];
+  return [
+    { label: "Tell me more 💭",      action: 'send', value: "Tell me more" },
+    { label: "I need support 🤝",    action: 'send', value: "I need some support today" },
+  ];
+}
+
+function detectEmotion(text) {
+  const t = text.toLowerCase();
+  if (t.match(/sad|down|depress|lonely|grief|unhappy|calming music|uplifting video/))
+    return 'sad';
+  if (t.match(/anxi|stress|panic|worry|overwhelm|breathing|grounding/))
+    return 'anxious';
+  if (t.match(/happy|great|good|joy|excit|wonderful|upbeat|journal/))
+    return 'happy';
+  return 'default';
+}
+
+// ── Input handlers ─────────────────────────────────────────────────────────
+
 document.getElementById("chatInput").addEventListener("keydown", function (e) {
   if (e.key === "Enter") {
     e.preventDefault();
     const input = document.getElementById("chatInput");
-    const message = input.value.trim();
-    if (message) {
-      sendMessage(message);
-      input.value = "";
-    }
+    const msg = input.value.trim();
+    if (msg) { sendMessage(msg); input.value = ""; }
   }
 });
 
-// Handle send icon click
 document.getElementById("send-icon").addEventListener("click", function () {
   const input = document.getElementById("chatInput");
-  const message = input.value.trim();
-  if (message) {
-    sendMessage(message);
-    input.value = "";
-  }
+  const msg = input.value.trim();
+  if (msg) { sendMessage(msg); input.value = ""; }
 });
 
-function sendMessage(message, isWelcome = false) {
+// ── Core send ──────────────────────────────────────────────────────────────
+
+function sendMessage(message) {
   const chatBody = document.getElementById("chatbotBody");
 
-  // Remove previous suggestion buttons
-  document.querySelectorAll(".option-button").forEach(btn => btn.remove());
+  document.querySelectorAll(".chat-chips").forEach(c => c.remove());
 
-  if (!isWelcome) {
-    const userBubble = document.createElement("div");
-    userBubble.className = "user-message";
-    userBubble.textContent = message;
-    chatBody.appendChild(userBubble);
-  }
-
+  const userBubble = document.createElement("div");
+  userBubble.className = "user-message";
+  userBubble.textContent = message;
+  chatBody.appendChild(userBubble);
   chatBody.scrollTop = chatBody.scrollHeight;
 
-  fetch('http://localhost:5001/dialogflow', {
+  showTypingIndicator();
+
+  fetch('http://localhost:5001/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: message })
+    body: JSON.stringify({ message, session: SESSION_ID }),
   })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(data => {
-      const botResponse = data.reply || "Sorry, I didn’t understand that.";
+      hideTypingIndicator();
+      const reply = data.reply || "I'm here for you. Could you share a bit more?";
+      const { length } = appendBotMessage(reply);
 
-      const botBubble = document.createElement("div");
-      botBubble.className = "bot-message";
-      botBubble.textContent = botResponse;
-      chatBody.appendChild(botBubble);
-      chatBody.scrollTop = chatBody.scrollHeight;
-
-      const responseLower = botResponse.toLowerCase();
-
-      // Show suggestions based on response keywords
-      if (responseLower.includes("calming music") || responseLower.includes("uplifting video")) {
-        showSuggestions("sad");
-      } else if (responseLower.includes("breathing") || responseLower.includes("grounding")) {
-        showSuggestions("anxious");
-      } else if (responseLower.includes("upbeat music") || responseLower.includes("write in journal")) {
-        showSuggestions("happy");
-      }
+      const emotion = detectEmotion(message + ' ' + reply);
+      // Show chips after typewriter finishes
+      setTimeout(() => showChips(chipsForEmotion(emotion)), length * 16 + 150);
     })
-    .catch(error => {
-      console.error("Error:", error);
-      const errorBubble = document.createElement("div");
-      errorBubble.className = "bot-message";
-      errorBubble.textContent = "Oops! Something went wrong.";
-      chatBody.appendChild(errorBubble);
-      chatBody.scrollTop = chatBody.scrollHeight;
+    .catch(err => {
+      hideTypingIndicator();
+      console.error("Chat error:", err);
+      appendBotMessage("Oops! Something went wrong. Please try again.", false);
     });
-}
-
-function showSuggestions(type) {
-  const chatBody = document.getElementById("chatbotBody");
-  let options = [];
-
-  if (type === "sad") {
-    options = [
-      { label: "Calming Music 🎵", url: "https://open.spotify.com/playlist/37i9dQZF1DX4sWSpwq3LiO" },
-      { label: "Uplifting Video 🎥", url: "https://www.youtube.com/watch?v=ZRI1k4kYmlI" },
-      { label: "Read Article 📖", url: "https://www.healthline.com/health/mental-health/self-care" }
-    ];
-  } else if (type === "anxious") {
-    options = [
-      { label: "Breathing Exercise 🧘", url: "https://www.youtube.com/watch?v=nmFUDkj1Aq0" },
-      { label: "Grounding Article 📚", url: "https://www.healthline.com/health/grounding-techniques" }
-    ];
-  } else if (type === "happy") {
-    options = [
-      { label: "Upbeat Music 🎶", url: "https://www.youtube.com/watch?v=ZbZSe6N_BXs" },
-      { label: "Write in Journal ✍", url: "../journal/journal.html" }
-    ];
-  }
-
-  options.forEach(option => {
-    const btn = document.createElement("button");
-    btn.textContent = option.label;
-    btn.className = "option-button";
-    btn.onclick = () => window.open(option.url, "_blank");
-    chatBody.appendChild(btn);
-  });
-
-  chatBody.scrollTop = chatBody.scrollHeight;
 }

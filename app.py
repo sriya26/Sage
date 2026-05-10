@@ -5,8 +5,9 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 from transformers import pipeline
 from werkzeug.utils import secure_filename
-from google.cloud import dialogflow_v2 as dialogflow
+import ollama
 import bcrypt
+import base64
 import os
 import json
 
@@ -14,8 +15,19 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS to connect frontend to backend
 app.config['UPLOAD_FOLDER'] = 'uploads/'
 
-#dialogflow key
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "sagebot-service.json"
+SYSTEM_PROMPT = (
+    "You are Sage, a warm and empathetic mental wellness companion. "
+    "Your role is to help users reflect on their emotions, feel heard, and find calm. "
+    "Keep responses concise — 2 to 3 sentences. Be gentle, supportive, and non-clinical. "
+    "Never diagnose or prescribe. If someone seems in crisis, encourage them to reach out "
+    "to a mental health professional or a crisis line. Avoid bullet points — speak naturally. "
+    "When a user seems sad or low, naturally mention 'calming music' or an 'uplifting video' as a suggestion. "
+    "When a user seems anxious or stressed, naturally mention a 'breathing exercise' or 'grounding technique'. "
+    "When a user seems happy or positive, naturally mention 'upbeat music' or suggest they 'write in your journal'."
+)
+
+# session_id -> list of {role, content} message dicts
+chat_sessions = {}
 
 
 #load the ml model pipeline
@@ -194,26 +206,112 @@ def weekly_report():
     })
 
 
-@app.route("/dialogflow", methods=["POST"])
-def dialogflow_webhook():
-    data = request.json
-    user_input = data.get("message", "")
-    session_id = data.get("session", "test-session")
+@app.route("/profile", methods=["POST"])
+def profile():
+    data = request.get_json()
+    user_email = data.get("email")
+    if not user_email:
+        return jsonify({"error": "Email required"}), 400
 
-    project_id = "sage-bot-465718"  # 👈 Replace this with your actual Dialogflow project ID
+    user = user_details.find_one({"email": user_email}, {"_id": 0, "password": 0})
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    entries = list(journal_collection.find({"user_email": user_email}, {"_id": 0}))
+
+    DATE_FORMATS = ["%Y-%m-%d", "%B %d, %Y", "%Y-%m-%d %H:%M:%S"]
+    def parse_date(s):
+        for fmt in DATE_FORMATS:
+            try:
+                return datetime.strptime(s, fmt)
+            except ValueError:
+                continue
+        return None
+
+    now = datetime.now()
+    emotion_counts = {}
+    month_count = 0
+    date_set = set()
+
+    for entry in entries:
+        em = entry.get("emotion", "unknown").lower()
+        emotion_counts[em] = emotion_counts.get(em, 0) + 1
+        d = parse_date(entry.get("date", ""))
+        if d:
+            if d.year == now.year and d.month == now.month:
+                month_count += 1
+            date_set.add(d.date())
+
+    # Streak: consecutive days ending today or yesterday
+    streak = 0
+    check = now.date()
+    if check not in date_set:
+        check -= timedelta(days=1)
+    while check in date_set:
+        streak += 1
+        check -= timedelta(days=1)
+
+    dominant = max(emotion_counts, key=emotion_counts.get) if emotion_counts else None
+
+    picture_url = None
+    if user.get("picture"):
+        picture_url = "data:image/jpeg;base64," + base64.b64encode(bytes(user["picture"])).decode()
+
+    recent = sorted(
+        [e for e in entries if parse_date(e.get("date", ""))],
+        key=lambda e: parse_date(e["date"]),
+        reverse=True
+    )[:5]
+
+    return jsonify({
+        "name": user.get("name"),
+        "email": user.get("email"),
+        "gender": user.get("gender"),
+        "picture": picture_url,
+        "stats": {
+            "total": len(entries),
+            "this_month": month_count,
+            "streak": streak,
+            "dominant_emotion": dominant,
+            "emotion_counts": emotion_counts,
+        },
+        "recent_entries": recent,
+    })
+
+
+# Ollama setup (required before running this route):
+#   1. Install Ollama: https://ollama.com/download  OR  brew install ollama
+#   2. Start the service: brew services start ollama
+#   3. Pull the model:    ollama pull llama3.2
+@app.route("/chat", methods=["POST"])
+def chat_with_sage():
+    data = request.json
+    user_input = data.get("message", "").strip()
+    session_id = data.get("session", "default")
+
+    if not user_input:
+        return jsonify({"reply": ""}), 200
+
+    history = chat_sessions.setdefault(session_id, [])
+    history.append({"role": "user", "content": user_input})
 
     try:
-        session_client = dialogflow.SessionsClient()
-        session = session_client.session_path(project_id, session_id)
-        text_input = dialogflow.TextInput(text=user_input, language_code="en")
-        query_input = dialogflow.QueryInput(text=text_input)
-        response = session_client.detect_intent(
-            request={"session": session, "query_input": query_input}
+        response = ollama.chat(
+            model="llama3.2",
+            messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history,
         )
-        return jsonify({"reply": response.query_result.fulfillment_text})
+        reply = response["message"]["content"]
+        history.append({"role": "assistant", "content": reply})
+
+        # Keep history bounded to last 20 turns
+        if len(history) > 20:
+            chat_sessions[session_id] = history[-20:]
+
+        return jsonify({"reply": reply})
     except Exception as e:
-        print("Dialogflow error:", e)
-        return jsonify({"reply": "I'm having trouble connecting right now. Please try again later."}), 500
+        print("Ollama error:", e)
+        history.pop()  # remove the user message we optimistically added
+        return jsonify({"reply": "I'm having trouble connecting right now. Please try again shortly."}), 500
 
 
 if __name__ == "__main__":

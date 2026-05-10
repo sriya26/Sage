@@ -1,0 +1,255 @@
+@font-face {
+  font-family: 'Chloe';
+  src: url('../fonts/Chloe-Regular.otf') format('opentype');
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  background: #f7f9fc;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 16px 110px;
+}
+
+/* ── Title ───────────────────────────────────────────────── */
+.title {
+  font-family: 'Chloe', serif;
+  font-size: 52px;
+  color: #254e72;
+  text-align: center;
+  margin: 0 0 20px;
+  font-weight: normal;
+}
+
+/* ── Profile card ────────────────────────────────────────── */
+.profile-card {
+  background: white;
+  border: 2px solid #254e72;
+  border-radius: 24px;
+  padding: 28px 20px 22px;
+  text-align: center;
+  box-shadow: 0 2px 12px rgba(37,78,114,0.08);
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  background: #254e72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 600;
+  color: #c0e8df;
+  overflow: hidden;
+  border: 3px solid #c0e8df;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-name {
+  font-size: 20px;
+  font-weight: 600;
+  color: #254e72;
+  margin: 0 0 4px;
+}
+
+.profile-email {
+  font-size: 13px;
+  color: #6b8caa;
+  margin: 0 0 10px;
+}
+
+.gender-badge {
+  display: inline-block;
+  background: #c0e8df;
+  color: #254e72;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  text-transform: capitalize;
+}
+
+/* ── Stats grid ──────────────────────────────────────────── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border: 2px solid #254e72;
+  border-radius: 20px;
+  padding: 18px 14px 14px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(37,78,114,0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-card svg {
+  width: 22px;
+  height: 22px;
+  opacity: 0.7;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 600;
+  color: #254e72;
+  line-height: 1;
+}
+
+.emotion-value {
+  font-size: 18px;
+  text-transform: capitalize;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #6b8caa;
+  letter-spacing: 0.03em;
+}
+
+/* ── Section cards ───────────────────────────────────────── */
+.section-card {
+  background: white;
+  border: 2px solid #254e72;
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(37,78,114,0.06);
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #254e72;
+  margin: 0 0 16px;
+}
+
+/* ── Donut chart ─────────────────────────────────────────── */
+.donut-wrapper {
+  max-width: 240px;
+  margin: 0 auto;
+}
+
+/* ── Recent entries ──────────────────────────────────────── */
+.recent-entry {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #eef2f6;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.recent-entry:last-child {
+  border-bottom: none;
+}
+
+.recent-entry:hover {
+  background: #f7f9fc;
+  border-radius: 10px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.entry-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.entry-date-label {
+  font-size: 11px;
+  color: #6b8caa;
+}
+
+.entry-preview-text {
+  font-size: 13px;
+  color: #254e72;
+  max-width: 280px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.emotion-pill {
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  text-transform: capitalize;
+  flex-shrink: 0;
+}
+
+.pill-joy      { background: #7ddc7a; }
+.pill-sadness  { background: #f39c12; }
+.pill-anger,
+.pill-fear     { background: #e74c3c; }
+.pill-surprise { background: #f1c40f; color: #333; }
+.pill-disgust  { background: #e67e22; }
+.pill-neutral  { background: #90b4ce; }
+
+/* ── Nav (same as journey) ───────────────────────────────── */
+.bottom-nav {
+  background-color: #f5f5f5;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 12px;
+  border-top: 1px solid #ddd;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+}
+
+.nav-icon {
+  width: 28px;
+  height: 28px;
+  transition: transform 0.15s ease;
+}
+
+.nav-item:hover .nav-icon {
+  transform: translateY(-2px);
+}
+
+.nav-label {
+  font-size: 11px;
+  color: #254e72;
+}
+
+.nav-label--active {
+  font-weight: 600;
+}

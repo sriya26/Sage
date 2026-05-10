@@ -24,6 +24,9 @@ function renderMoodChart(entries) {
   const chartSection = document.getElementById('mood-chart-section');
   chartSection.classList.remove('hidden');
 
+  // Sort oldest → newest so x-axis runs left to right
+  entries.sort((a, b) => new Date(a.date) - new Date(b.date));
+
   Chart.defaults.font.family = "'Montserrat', sans-serif";
   Chart.defaults.color = '#254e72';
 
