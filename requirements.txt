@@ -5,3 +5,5 @@ transformers==5.7.0
 Flask-Cors==3.0.10
 pymongo==4.5.0
 ollama
+chromadb
+sentence-transformers

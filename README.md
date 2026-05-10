@@ -13,7 +13,7 @@ Sage is a web-based mental wellness companion designed to help users track emoti
 - 👤 **Profile & Dashboard**: Personal profile page showing your photo, name, and four stat cards (total entries, this month, day streak, top emotion), plus a mood breakdown donut chart and recent entries list.
 - 📖 **Entry Detail View**: Tap any journal entry to open the full text in a dedicated page styled to match the journal page.
 - 🎶 **Therapy Recommendations**: Contextual resource suggestions (calming music, breathing exercises, grounding articles, uplifting videos) surfaced automatically based on detected emotion.
-- 🔒 **Secure Authentication**: Passwords hashed with bcrypt — never stored in plaintext.
+- 🔒 **Secure Authentication**
 - 💬 **Connect with a Therapist**: Suggests options to seek professional help based on user mood triggers (coming soon).
 
 ---

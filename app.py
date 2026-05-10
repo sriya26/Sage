@@ -10,6 +10,7 @@ import bcrypt
 import base64
 import os
 import json
+from rag_prompts import get_prompt_for_emotion
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS to connect frontend to backend
@@ -102,7 +103,12 @@ def submit_journal():
         "emotion": emotion
     })
 
-    return jsonify({"message": f"Journal entry saved with emotion: {emotion}"}), 200
+    suggested_prompt = get_prompt_for_emotion(emotion)
+
+    return jsonify({
+        "message": f"Journal entry saved with emotion: {emotion}",
+        "suggested_prompt": suggested_prompt,
+    }), 200
 
 @app.route("/get_journals", methods=["POST"])
 def get_journals():
