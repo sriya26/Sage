@@ -10,7 +10,8 @@ import bcrypt
 import base64
 import os
 import json
-from rag_prompts import get_prompt_for_emotion
+from rag.rag_prompts import get_prompt_for_emotion
+from analysis.pattern_analysis import generate_insights
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS to connect frontend to backend
@@ -318,6 +319,15 @@ def chat_with_sage():
         print("Ollama error:", e)
         history.pop()  # remove the user message we optimistically added
         return jsonify({"reply": "I'm having trouble connecting right now. Please try again shortly."}), 500
+
+
+@app.route("/insights", methods=["POST"])
+def insights():
+    data = request.get_json()
+    user_email = data.get("email")
+    if not user_email:
+        return jsonify({"error": "Email required"}), 400
+    return jsonify(generate_insights(user_email))
 
 
 if __name__ == "__main__":

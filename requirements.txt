@@ -7,3 +7,4 @@ pymongo==4.5.0
 ollama
 chromadb
 sentence-transformers
+pandas

@@ -1,4 +1,4 @@
-# ChromaDB collection is built on first run and persists locally to chroma_db/.
+# ChromaDB collection is built on first run and persists locally to rag/chroma_db/.
 # On subsequent restarts the collection is loaded directly — no re-embedding needed.
 
 import os

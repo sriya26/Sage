@@ -1,1 +1,16 @@
 sagebot-service.json
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# RAG vector store (auto-rebuilt on first run)
+rag/chroma_db/
+
+# User uploads
+uploads/
+
+# Env
+.env
+sage-env/
