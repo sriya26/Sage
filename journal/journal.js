@@ -59,10 +59,27 @@ document.addEventListener("DOMContentLoaded", function () {
             setTimeout(() => {
                 successMsg.classList.remove("show");
             }, 3000);
+            if (data.suggested_prompt) {
+                showReflectionCard(data.suggested_prompt);
+            }
         })
         .catch(err => {
             analysing.classList.remove("show");
             console.error("Error submitting journal:", err);
         });
     });
+
+    function showReflectionCard(prompt) {
+        const existing = document.getElementById("reflection-card");
+        if (existing) existing.remove();
+
+        const card = document.createElement("div");
+        card.id = "reflection-card";
+        card.className = "reflection-card";
+        card.innerHTML = `
+            <p class="reflection-heading">Reflect on this</p>
+            <p class="reflection-text">${prompt}</p>
+        `;
+        document.querySelector(".container").appendChild(card);
+    }
 });

@@ -1,3 +1,15 @@
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const iso = dateStr.slice(0, 10);
+  const parts = iso.split('-');
+  if (parts.length === 3 && parts[0].length === 4) {
+    const [y, m, d] = parts.map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+  const d = new Date(dateStr);
+  return isNaN(d) ? dateStr : d.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
 const EMOTION_COLOR = {
   joy:      '#7ddc7a',
   surprise: '#f1c40f',
@@ -135,7 +147,7 @@ function renderRecentEntries(entries) {
     row.className = 'recent-entry';
     row.innerHTML = `
       <div class="entry-meta">
-        <span class="entry-date-label">${entry.date ? entry.date.slice(0, 10) : ''}</span>
+        <span class="entry-date-label">${formatDate(entry.date)}</span>
         <span class="entry-preview-text">${entry.entry || ''}</span>
       </div>
       <span class="emotion-pill pill-${em}">${em}</span>
