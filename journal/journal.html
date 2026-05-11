@@ -35,6 +35,29 @@
     <form id="journal-form">
       <div class="entry-box">
         <textarea id="journal-entry" placeholder="Write your thoughts here..."></textarea>
+        <div class="editor-footer">
+          <div class="footer-left">
+            <div class="footer-icon" title="Voice memo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="3" width="6" height="12" rx="3"/>
+                <path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3"/>
+              </svg>
+            </div>
+            <div class="footer-icon" title="Add photo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="16" rx="2"/>
+                <circle cx="9" cy="10" r="2"/>
+                <path d="M21 16l-5-5-9 9"/>
+              </svg>
+            </div>
+            <div class="footer-icon" title="Tag">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 4h12v17l-6-4-6 4V4z"/>
+              </svg>
+            </div>
+          </div>
+          <span id="word-count">0 words</span>
+        </div>
       </div>
       <button type="submit" class="submit-button" id="submit-btn">Submit</button>
     </form>

@@ -3,29 +3,382 @@
   src: url('../fonts/Chloe-Regular.otf') format('opentype');
 }
 
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
-  background-color: #ffffff;
-  text-align: center;
+  background-color: #f6f7f6;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 }
 
-.container {
-  flex-grow: 1;
+/* ── Bottom wave decoration ── */
+/* CSS 210px / viewBox 160px = 1.31× vertical scale → blobs expand and look rounder */
+.deco-waves {
+  position: fixed;
+  left: 0; right: 0;
+  bottom: 58px; /* sits just above the bottom nav */
+  height: 210px;
+  pointer-events: none;
+  z-index: 0;
+  width: 100%;
+}
+
+/* ── Page header ── */
+.page-header {
+  padding: 20px 32px 0;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.greeting { margin-top: 2px; margin-bottom: 4px; }
+
+.eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b8caa;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.greeting-h {
+  font-size: 26px;
+  color: #254e72;
+  font-weight: 400;
+  margin: 0 0 4px;
+  font-style: italic;
+}
+
+.greeting-sub {
+  font-size: 13px;
+  color: #6b8caa;
+  margin: 0;
+}
+
+/* ── Two-column layout ── */
+.home-body {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  max-width: 1100px;
+  margin: 20px auto 0;
+  padding: 0 32px 120px;
+  box-sizing: border-box;
+  width: 100%;
+  align-items: start;
+  position: relative;
+  z-index: 1;
+}
+
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.home-side {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── Week calendar ── */
+.weekcal {
+  background: #fff;
+  border: 1.5px solid #e8eff7;
+  border-radius: 20px;
+  padding: 14px 16px;
+  box-shadow: 0 2px 8px rgba(37,78,114,0.05);
+}
+
+.weekcal-hd { margin-bottom: 10px; }
+
+.weekcal-mo {
+  font-size: 12px;
+  font-weight: 700;
+  color: #254e72;
+  letter-spacing: 0.04em;
+}
+
+.weekcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.weekday-cell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 10px 20px 100px;
+  gap: 4px;
+  padding: 8px 2px;
+  border-radius: 12px;
+  transition: background 0.15s;
+}
+
+.weekday-cell.today { background: rgba(37,78,114,0.09); }
+
+.wday {
+  font-size: 9px;
+  color: #6b8caa;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.wdate {
+  font-size: 15px;
+  font-weight: 700;
+  color: #254e72;
+  line-height: 1;
+}
+
+.wdot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+/* ── Entries block ── */
+.entries-block {
+  background: #fff;
+  border: 1.5px solid #e8eff7;
+  border-radius: 20px;
+  padding: 16px 18px;
+  box-shadow: 0 2px 8px rgba(37,78,114,0.05);
+}
+
+.entries-hd { margin-bottom: 10px; }
+
+.entries-ttl {
+  font-size: 12px;
+  font-weight: 700;
+  color: #254e72;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Entry cards (day-stub format) ── */
+.entry-new {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid #e8eff7;
+  background: #fff;
+  cursor: pointer;
+  transition: box-shadow 0.15s, border-color 0.15s;
+  margin-bottom: 8px;
+}
+
+.entry-new:last-child { margin-bottom: 0; }
+
+.entry-new:hover {
+  box-shadow: 0 4px 14px rgba(37,78,114,0.1);
+  border-color: #c9daea;
+}
+
+.day-stub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  border-right: 1.5px solid #e8eff7;
+  padding-right: 10px;
+}
+
+.wday-s {
+  font-size: 9px;
+  color: #6b8caa;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+.wdate-s {
+  font-size: 20px;
+  font-weight: 700;
+  color: #254e72;
+  line-height: 1;
+}
+
+.entry-snip {
+  font-size: 13px;
+  color: #254e72;
+  line-height: 1.5;
+  margin: 0;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.moodtag {
+  padding: 5px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Unified side cards (right rail) ── */
+.side-card {
+  background: #fff;
+  border: 1.5px solid #d7dce8;
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(37,78,114,0.07);
+  width: 100%;
+}
+
+/* ── Compose CTA (top side card) ── */
+.compose-cta {
+  text-align: center;
+}
+
+.compose-illo {
+  width: 130px;
+  height: auto;
+  margin: 0 auto 8px;
+  display: block;
+}
+
+.compose-label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #6b8caa;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.compose-heading {
+  font-size: 16px;
+  color: #254e72;
+  font-weight: 600;
+  margin: 0 0 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.compose-sub {
+  font-size: 12px;
+  color: #6b8caa;
+  margin: 0 0 14px;
+}
+
+.write-btn {
+  display: inline-block;
+  background: #254e72;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  transition: background 0.15s;
+}
+
+.write-btn:hover { background: #1a3853; }
+
+/* ── Left-column section card (chart) ── */
+.section-card {
+  background: #fff;
+  border: 1.5px solid #d7dce8;
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 10px rgba(37,78,114,0.07);
+}
+
+/* Override old standalone section sizing */
+#insights-section,
+#weekly-report-section,
+#mood-chart-section {
+  width: auto;
+  max-width: none;
+  margin: 0;
+}
+
+/* Chart wrapper inside section-card: remove duplicate border */
+#mood-chart-section .chart-wrapper {
+  border: none;
+  box-shadow: none;
+  padding: 8px 0 0;
+  background: transparent;
+}
+
+.card-hd {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.card-ttl {
+  font-size: 12px;
+  font-weight: 700;
+  color: #254e72;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ── Insights plist ── */
+.plist { display: flex; flex-direction: column; gap: 12px; }
+
+.pitem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.pdot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.phead {
+  font-size: 12px;
+  font-weight: 700;
+  color: #254e72;
+  margin-bottom: 2px;
+}
+
+.psub {
+  font-size: 11.5px;
+  color: #6b8caa;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Responsive: collapse to single column on narrow screens ── */
+@media (max-width: 700px) {
+  .home-body {
+    grid-template-columns: 1fr;
+    padding: 0 16px 120px;
+  }
+  .page-header { padding: 16px 16px 0; }
 }
 
 .title {
-  font-size: 70px;
-  font-weight: normal; /* Remove boldness */
+  font-size: 56px;
+  font-weight: normal;
   color: #254e72;
-  margin-bottom: 20px;
+  margin: 0 0 4px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   font-family: 'Chloe', serif;
 }
@@ -305,13 +658,17 @@ body {
   align-items: center;
   justify-content: space-between;
   margin-left: 0;
-  align-self: flex-start; /* Ensure each box is left-aligned */
+  align-self: stretch;
+  min-height: 100px;
+  box-sizing: border-box;
 }
 
 .entry-preview {
-  max-width: 70%;
+  flex: 1;
   color: #1b426b;
   font-size: 18px;
+  text-align: center;
+  padding-right: 20px;
 }
 
 .emotion-badge {
@@ -418,6 +775,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  align-items: stretch;
 }
 
 .illustration-right {

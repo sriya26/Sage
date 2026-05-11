@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Sage — Home (Preview)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg"/>
+<style>
+  :root {
+    --navy:    #133855;
+    --navy-2:  #21506F;
+    --mint:    #C7E8DC;
+    --mint-2:  #DBF0E7;
+    --mint-3:  #EEF7F2;
+    --cream:   #F8DCC5;
+    --cream-2: #FCE8D4;
+    --orange:  #F2A03D;
+    --gray-100:#F6F7F6;
+    --gray-200:#ECEFEC;
+    --gray-300:#D7DCD8;
+    --gray-500:#6B7470;
+    --gray-700:#3F4744;
+    --joy:     #82C7A1;
+    --neutral: #9DB6C4;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { background: #eff0ef; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: var(--navy);
+    min-height: 100vh;
+    padding-bottom: 70px; /* nav height */
+  }
+
+  /* ── Preview banner ── */
+  .preview-banner {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    background: var(--orange);
+    color: #fff;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    z-index: 200;
+  }
+
+  .page {
+    max-width: 1280px;
+    margin: 28px auto 0;
+    background: #fff;
+    position: relative;
+    min-height: calc(100vh - 28px);
+  }
+
+  /* ── Bottom wave decoration ── */
+  .deco-waves {
+    position: fixed;
+    left: 0; right: 0; bottom: 58px; /* above nav */
+    height: 200px;
+    pointer-events: none;
+    z-index: 0;
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+
+  /* ── Sage wordmark ── */
+  .brand {
+    text-align: center;
+    padding: 24px 0 10px;
+    font-family: 'DM Serif Display', serif;
+    font-size: 44px;
+    font-weight: 400;
+    color: var(--navy);
+    line-height: 1;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* ── Greeting strip ── */
+  .greeting {
+    padding: 0 56px 22px;
+    position: relative;
+    z-index: 3;
+  }
+  .greeting .eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--navy-2);
+    opacity: 0.65;
+    margin-bottom: 7px;
+  }
+  .greeting h2 {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    font-size: 30px;
+    line-height: 1.15;
+    color: var(--navy);
+    margin-bottom: 6px;
+  }
+  .greeting h2 em { font-style: italic; color: var(--navy-2); }
+  .greeting .sub {
+    font-size: 13.5px;
+    color: var(--gray-500);
+    line-height: 1.5;
+    max-width: 60ch;
+  }
+
+  /* ── Two-column body ── */
+  .home-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(0, 360px);
+    gap: 26px;
+    padding: 0 56px 220px;
+    position: relative;
+    z-index: 3;
+    align-items: start;
+  }
+
+  .home-main { display: flex; flex-direction: column; gap: 22px; }
+  .home-side  { display: flex; flex-direction: column; gap: 14px; }
+
+  /* ── Week calendar ── */
+  .weekcal {
+    background: #fff;
+    border-radius: 22px;
+    border: 1px solid var(--gray-200);
+    padding: 18px 20px;
+    box-shadow: 0 2px 8px rgba(19,56,85,0.05);
+  }
+  .weekcal-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .weekcal-mo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 20px;
+    color: var(--navy);
+  }
+  .weekcal-nav { display: flex; gap: 6px; }
+  .nav-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--gray-100);
+    border: none;
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    cursor: pointer;
+  }
+  .nav-btn svg { width: 13px; height: 13px; }
+  .weekcal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }
+  .day {
+    aspect-ratio: 1/1.35;
+    border-radius: 14px;
+    background: var(--gray-100);
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 6px 9px;
+    cursor: pointer;
+    position: relative;
+  }
+  .day .dow {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+  }
+  .day .num { font: 700 16px 'Nunito'; }
+  .day .mood-dot {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--gray-300);
+  }
+  .day.has .mood-dot.sad  { background: var(--orange); }
+  .day.has .mood-dot.neu  { background: var(--neutral); }
+  .day.has .mood-dot.joy  { background: var(--joy); }
+  .day.empty .mood-dot    { background: transparent; border: 1.5px dashed var(--gray-300); }
+  .day.today {
+    background: var(--navy);
+    color: #fff;
+    box-shadow: 0 12px 22px -16px rgba(19,56,85,0.55);
+  }
+  .day.today .dow { color: rgba(255,255,255,0.65); }
+  .day.today .num { color: #fff; }
+  .day.today .mood-dot { background: var(--orange); }
+
+  /* ── Entry list ── */
+  .entries-hd {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .entries-hd .ttl {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+  }
+  .filter-chips { display: flex; gap: 6px; }
+  .filter-chip {
+    padding: 5px 13px;
+    border-radius: 999px;
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    font-size: 12px;
+    color: var(--navy);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .filter-chip.on {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+  .entry-list { display: flex; flex-direction: column; gap: 12px; }
+  .entry {
+    background: #fff;
+    border: 1.5px solid var(--navy);
+    border-radius: 18px;
+    padding: 14px 16px;
+    display: grid;
+    grid-template-columns: 52px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    box-shadow: 0 12px 24px -22px rgba(19,56,85,0.3);
+    cursor: pointer;
+    transition: box-shadow 0.15s;
+  }
+  .entry:hover { box-shadow: 0 14px 28px -18px rgba(19,56,85,0.45); }
+  .day-stub {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  .d-mo {
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gray-500);
+  }
+  .d-n {
+    font: 400 24px 'DM Serif Display', serif;
+    line-height: 1;
+    color: var(--navy);
+  }
+  .d-time { font-size: 10px; color: var(--gray-500); }
+  .body-col { min-width: 0; }
+  .preview-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 3px;
+  }
+  .preview-text {
+    font-size: 13px;
+    color: var(--gray-700);
+    line-height: 1.45;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .tagcol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .moodtag {
+    padding: 5px 12px;
+    border-radius: 999px;
+    font: 700 11.5px 'Nunito';
+    color: #fff;
+  }
+  .moodtag.sad { background: var(--orange); }
+  .moodtag.neu { background: var(--neutral); }
+  .moodtag.joy { background: var(--joy); }
+  .meta-tags { display: flex; gap: 4px; }
+  .tag {
+    background: var(--gray-100);
+    padding: 3px 7px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: var(--gray-500);
+  }
+
+  /* ── Right rail ── */
+
+  /* Compose CTA */
+  .compose-cta {
+    background: linear-gradient(180deg, var(--mint-3), var(--mint));
+    border-radius: 20px;
+    padding: 22px 20px 20px;
+    border: 1px solid var(--mint);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+  }
+  .compose-cta .illo {
+    width: 160px; height: 160px;
+    display: grid;
+    place-items: center;
+    margin-bottom: 10px;
+  }
+  .compose-label {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--navy-2);
+    opacity: 0.7;
+    margin-bottom: 6px;
+  }
+  .compose-h {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    line-height: 1.2;
+    color: var(--navy);
+    margin-bottom: 8px;
+  }
+  .compose-h em {
+    font-style: italic;
+    border-bottom: 2px solid var(--orange);
+  }
+  .compose-sub {
+    font-size: 12.5px;
+    color: var(--navy-2);
+    margin-bottom: 16px;
+    line-height: 1.5;
+    max-width: 26ch;
+  }
+  .compose-btns { display: flex; gap: 8px; }
+  .write-btn {
+    background: var(--navy);
+    color: #fff;
+    border: 0;
+    padding: 11px 20px;
+    border-radius: 12px;
+    font: 600 13.5px 'Nunito';
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .write-btn:hover { background: var(--navy-2); }
+  .write-btn svg { width: 15px; height: 15px; }
+  .voice-btn {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid var(--mint);
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    cursor: pointer;
+  }
+  .voice-btn svg { width: 16px; height: 16px; }
+
+  /* Shared card style */
+  .rail-card {
+    background: #fff;
+    border: 1px solid var(--gray-200);
+    border-radius: 20px;
+    padding: 16px 18px;
+    box-shadow: 0 2px 6px rgba(19,56,85,0.04);
+  }
+  .card-hd {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .card-hd .ic {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    flex-shrink: 0;
+  }
+  .card-hd .ic.mint  { background: var(--mint); }
+  .card-hd .ic.cream { background: var(--cream-2); }
+  .card-hd .ic svg { width: 12px; height: 12px; }
+  .card-label {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--navy-2);
+    opacity: 0.75;
+    font-weight: 700;
+  }
+
+  /* Patterns */
+  .plist { display: flex; flex-direction: column; gap: 10px; }
+  .pitem {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 12.5px;
+    line-height: 1.4;
+    color: var(--navy);
+  }
+  .pdot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-top: 6px;
+    justify-self: center;
+  }
+  .pdot.sad { background: var(--orange); }
+  .pdot.neu { background: var(--neutral); }
+  .pdot.joy { background: var(--joy); }
+  .pitem b { font-weight: 700; }
+  .pitem .psub {
+    color: var(--gray-500);
+    font-size: 11.5px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  /* Week in review */
+  .insight-text {
+    font-family: 'DM Serif Display', serif;
+    font-style: italic;
+    font-size: 15.5px;
+    line-height: 1.4;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .barwrap { display: flex; flex-direction: column; gap: 7px; }
+  .barrow {
+    display: grid;
+    grid-template-columns: 64px 1fr 32px;
+    gap: 10px;
+    align-items: center;
+    font-size: 12px;
+    color: var(--navy);
+  }
+  .track {
+    height: 7px;
+    background: var(--gray-100);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .fill { height: 100%; border-radius: 99px; }
+  .pct { color: var(--gray-500); text-align: right; }
+
+  /* Mood mini */
+  .mood-mini-hd {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .mood-mini-hd .ttl { font-size: 12.5px; font-weight: 700; color: var(--navy); }
+  .mood-mini-hd .more { font-size: 12px; color: var(--navy-2); font-weight: 600; cursor: pointer; }
+  .chartwrap { height: 88px; }
+  .chartwrap svg { width: 100%; height: 100%; }
+  .legend {
+    display: flex;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--gray-500);
+    margin-top: 6px;
+  }
+  .legend .l { display: flex; gap: 5px; align-items: center; }
+  .legend .ld { width: 8px; height: 8px; border-radius: 50%; }
+
+  /* ── Bottom nav ── */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: var(--gray-100);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 12px 14px;
+    border-top: 1px solid var(--gray-200);
+    z-index: 50;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    font-size: 11px;
+    color: var(--gray-500);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .nav-item.active { color: var(--navy); }
+  .nav-item svg { width: 22px; height: 22px; }
+
+  /* ── Cloud chatbot button ── */
+  .cloud-btn {
+    position: fixed;
+    bottom: 76px; right: 22px;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    border: 2px solid var(--navy);
+    display: grid;
+    place-items: center;
+    color: var(--navy);
+    box-shadow: 0 8px 18px -10px rgba(19,56,85,0.4);
+    text-decoration: none;
+    z-index: 10;
+    transition: box-shadow 0.15s;
+  }
+  .cloud-btn svg { width: 26px; height: 26px; }
+</style>
+</head>
+<body>
+
+<div class="preview-banner">Preview — Home / Journey Enhanced · not yet live</div>
+
+<div class="page">
+
+  <!-- Bottom wave decoration -->
+  <svg class="deco-waves" viewBox="0 0 1280 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="1280" height="200" fill="#fff"/>
+    <path d="M-20 200 L-20 100 C 60 60, 180 40, 280 80 C 360 112, 380 170, 460 190 C 510 204, 520 200, 520 200 Z" fill="#133855"/>
+    <path d="M1300 200 L1300 100 C 1220 60, 1100 52, 1010 87 C 920 122, 900 170, 820 190 C 770 204, 760 200, 760 200 Z" fill="#133855"/>
+    <path d="M500 200 C 540 160, 600 140, 640 155 C 680 168, 740 160, 780 200" stroke="#F8DCC5" stroke-width="4" fill="none"/>
+    <path d="M520 200 C 560 184, 620 174, 660 184 C 700 194, 720 200, 760 200" stroke="#F8DCC5" stroke-width="3" fill="none" opacity="0.65"/>
+    <circle cx="120" cy="138" r="5" fill="#fff"/>
+    <circle cx="170" cy="158" r="3" fill="#fff"/>
+    <circle cx="60" cy="168" r="4" fill="#F8DCC5"/>
+    <circle cx="350" cy="144" r="4" fill="#fff"/>
+    <circle cx="430" cy="180" r="3" fill="#F8DCC5"/>
+    <circle cx="850" cy="145" r="4" fill="#fff"/>
+    <circle cx="990" cy="130" r="4" fill="#F8DCC5"/>
+    <circle cx="1130" cy="150" r="3" fill="#F8DCC5"/>
+    <circle cx="1200" cy="170" r="4" fill="#fff"/>
+  </svg>
+
+  <!-- Sage wordmark -->
+  <div class="brand">Sage</div>
+
+  <!-- Greeting -->
+  <div class="greeting">
+    <div class="eyebrow">Sunday, May 11 · evening</div>
+    <h2>Welcome back, <em>Shreya</em>.</h2>
+    <div class="sub">It's been a tender week. You haven't journaled yet today — Sage will keep it short if you want.</div>
+  </div>
+
+  <!-- Two-column body -->
+  <div class="home-body">
+
+    <!-- LEFT: main column -->
+    <div class="home-main">
+
+      <!-- Week calendar -->
+      <div class="weekcal">
+        <div class="weekcal-hd">
+          <div class="weekcal-mo">May 2026 · This week</div>
+          <div class="weekcal-nav">
+            <button class="nav-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button class="nav-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
+        </div>
+        <div class="weekcal-grid" id="week-grid"></div>
+      </div>
+
+      <!-- Entry list -->
+      <div>
+        <div class="entries-hd">
+          <div class="ttl">Recent entries</div>
+          <div class="filter-chips">
+            <div class="filter-chip on">All</div>
+            <div class="filter-chip">Sad</div>
+            <div class="filter-chip">Neutral</div>
+            <div class="filter-chip">Joy</div>
+          </div>
+        </div>
+        <div class="entry-list" id="entry-list"></div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: side rail -->
+    <div class="home-side">
+
+      <!-- Compose CTA with meditation illustration -->
+      <div class="compose-cta">
+        <div class="illo">
+          <svg width="160" height="160" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+            <path d="M150 50 C 200 50, 220 110, 195 160 C 175 195, 145 195, 130 175 Z" fill="#3A6F8F"/>
+            <path d="M85 60 C 50 60, 35 110, 60 155 C 78 180, 110 185, 120 165 Z" fill="#79C0DC"/>
+            <path d="M170 90 C 200 100, 205 140, 185 165" stroke="#133855" stroke-width="3" fill="none"/>
+            <ellipse cx="120" cy="110" rx="40" ry="44" fill="#F4C39E"/>
+            <path d="M82 110 C 78 70, 110 50, 130 55 C 150 60, 162 90, 160 110 L 160 150 L 152 150 L 152 90 L 86 90 Z" fill="#1B2747"/>
+            <path d="M78 100 C 78 140, 82 170, 90 200 L 96 200 L 96 140 Z" fill="#1B2747"/>
+            <path d="M156 100 C 162 140, 158 170, 150 200 L 144 200 L 144 140 Z" fill="#1B2747"/>
+            <g transform="translate(95 50)">
+              <ellipse cx="25" cy="20" rx="26" ry="16" fill="#E26A75"/>
+              <path d="M5 20 C 10 10, 20 8, 25 15 M25 15 C 30 8, 40 10, 45 20" stroke="#A0454F" stroke-width="1.5" fill="none"/>
+              <path d="M25 8 L25 30" stroke="#A0454F" stroke-width="1.2" fill="none"/>
+            </g>
+            <path d="M100 115 C 105 119, 112 119, 117 115" stroke="#133855" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M123 115 C 128 119, 135 119, 140 115" stroke="#133855" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <circle cx="98" cy="128" r="5" fill="#E89494" opacity="0.55"/>
+            <circle cx="142" cy="128" r="5" fill="#E89494" opacity="0.55"/>
+            <path d="M112 138 C 117 142, 123 142, 128 138" stroke="#133855" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M60 230 C 70 195, 95 175, 120 175 C 145 175, 170 195, 180 230 Z" fill="#3A6F8F"/>
+            <path d="M108 210 L 120 200 L 132 210 L 132 230 L 108 230 Z" fill="#F4C39E"/>
+          </svg>
+        </div>
+        <div class="compose-label">Tonight</div>
+        <div class="compose-h">Set today's <em>state</em>.</div>
+        <div class="compose-sub">Two of your last three entries were sad. Sage has a softer prompt ready.</div>
+        <div class="compose-btns">
+          <button class="write-btn" onclick="window.location.href='../journal/journal.html'">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 21l4-1 11-11-3-3L4 17l-1 4z"/><path d="M14 6l3 3"/>
+            </svg>
+            Start writing
+          </button>
+          <div class="voice-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="3" width="6" height="12" rx="3"/>
+              <path d="M5 11a7 7 0 0014 0"/><path d="M12 18v3"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Your Patterns -->
+      <div class="rail-card">
+        <div class="card-hd">
+          <div class="ic cream">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+            </svg>
+          </div>
+          <span class="card-label">Your patterns</span>
+        </div>
+        <div class="plist">
+          <div class="pitem">
+            <span class="pdot sad"></span>
+            <div><b>Sadness peaks on Mondays.</b><span class="psub">3 of your last 4 Monday entries were sad.</span></div>
+          </div>
+          <div class="pitem">
+            <span class="pdot neu"></span>
+            <div><b>You journal later on tough days.</b><span class="psub">Avg 10:42 PM on sad days vs. 8:10 PM on neutral.</span></div>
+          </div>
+          <div class="pitem">
+            <span class="pdot joy"></span>
+            <div><b>Low mood streak: 4 days.</b><span class="psub">Your longest consecutive run this past month.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Week in review -->
+      <div class="rail-card">
+        <div class="card-hd">
+          <div class="ic mint">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+            </svg>
+          </div>
+          <span class="card-label">Week in review</span>
+        </div>
+        <div class="insight-text">"You journaled 4 times this week — a tough week. Sadness was your most common mood (75%)."</div>
+        <div class="barwrap">
+          <div class="barrow">
+            <span>Sadness</span>
+            <div class="track"><div class="fill" style="width:75%; background:var(--orange)"></div></div>
+            <span class="pct">75%</span>
+          </div>
+          <div class="barrow">
+            <span>Neutral</span>
+            <div class="track"><div class="fill" style="width:25%; background:var(--neutral)"></div></div>
+            <span class="pct">25%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mood mini chart -->
+      <div class="rail-card">
+        <div class="mood-mini-hd">
+          <div class="ttl">Mood — last 30 days</div>
+          <div class="more">View full →</div>
+        </div>
+        <div class="chartwrap">
+          <svg viewBox="0 0 280 88" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1">
+                <stop offset="0%" stop-color="#133855" stop-opacity="0.16"/>
+                <stop offset="100%" stop-color="#133855" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path d="M0 64 C 30 54, 50 59, 70 54 S 120 44, 140 49 S 190 64, 220 58 S 270 44, 280 42 L 280 88 L 0 88 Z" fill="url(#g1)"/>
+            <path d="M0 64 C 30 54, 50 59, 70 54 S 120 44, 140 49 S 190 64, 220 58 S 270 44, 280 42" stroke="#133855" stroke-width="2" fill="none"/>
+            <circle cx="40"  cy="59" r="4" fill="#F2A03D"/>
+            <circle cx="120" cy="46" r="4" fill="#9DB6C4"/>
+            <circle cx="200" cy="62" r="4" fill="#F2A03D"/>
+            <circle cx="265" cy="44" r="4" fill="#9DB6C4"/>
+          </svg>
+        </div>
+        <div class="legend">
+          <div class="l"><span class="ld" style="background:var(--joy)"></span>joy</div>
+          <div class="l"><span class="ld" style="background:var(--neutral)"></span>neutral</div>
+          <div class="l"><span class="ld" style="background:var(--orange)"></span>sadness</div>
+        </div>
+      </div>
+
+    </div><!-- /home-side -->
+  </div><!-- /home-body -->
+</div><!-- /page -->
+
+<!-- Cloud chatbot -->
+<a href="#" class="cloud-btn" title="Open Sage-bot">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M7 18a5 5 0 110-10 6 6 0 0111 3 4 4 0 010 7H7z"/>
+  </svg>
+</a>
+
+<!-- Bottom nav -->
+<nav class="bottom-nav">
+  <a class="nav-item active" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 12 12 3 21 12"/><path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/></svg>
+    <span>Home</span>
+  </a>
+  <a class="nav-item" href="#">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M3 18a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3v5z"/><path d="M21 18a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3v5z"/></svg>
+    <span>Music</span>
+  </a>
+  <a class="nav-item" href="../journal/journal.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+    <span>Journal</span>
+  </a>
+  <a class="nav-item" href="../profile/profile.html">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <span>Profile</span>
+  </a>
+</nav>
+
+<script>
+  // Week calendar
+  const days = [
+    { dow:'Wed', n:6,  mood:'sad', has:true  },
+    { dow:'Thu', n:7,  mood:'neu', has:true  },
+    { dow:'Fri', n:8,  mood:null,  has:false, empty:true },
+    { dow:'Sat', n:9,  mood:'sad', has:true  },
+    { dow:'Sun', n:10, mood:'neu', has:true  },
+    { dow:'Mon', n:11, mood:null,  has:false, today:true },
+    { dow:'Tue', n:12, mood:null,  has:false, empty:true },
+  ];
+  const grid = document.getElementById('week-grid');
+  days.forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'day' + (d.has?' has':'') + (d.today?' today':'') + (d.empty?' empty':'');
+    el.innerHTML = `
+      <span class="dow">${d.dow}</span>
+      <span class="num">${d.n}</span>
+      <span class="mood-dot ${d.mood||''}">${d.today?'+':''}</span>
+    `;
+    grid.appendChild(el);
+  });
+
+  // Entry list
+  const entries = [
+    { d:'MAY', n:11, time:'10:30 PM', title:'My life is so uncertain right now', body:"Things are working out for everyone except me it feels like. The weight of this week is a lot to carry.", mood:'sad', moodLbl:'sadness', tags:['#self'] },
+    { d:'MAY', n:10, time:'9:14 PM',  title:'A quieter Monday', body:"Tried not to push through today. Made tea instead of coffee. Talked to S. for a bit — it actually helped.", mood:'neu', moodLbl:'neutral', tags:['#family','#rest'] },
+    { d:'MAY', n:9,  time:'11:02 PM', title:'Things have still not changed', body:"for the better. It's still the same waiting, the same loop of checking my inbox like that'll change anything.", mood:'sad', moodLbl:'sadness', tags:['#work'] },
+    { d:'MAY', n:4,  time:'10:30 PM', title:'Today was a bad day as usual', body:"The weight of not getting an interview I'd convinced myself I had. I know there will be more but it doesn't feel like it.", mood:'sad', moodLbl:'sadness', tags:['#work'] },
+  ];
+  const list = document.getElementById('entry-list');
+  entries.forEach(e => {
+    const el = document.createElement('div');
+    el.className = 'entry';
+    el.innerHTML = `
+      <div class="day-stub">
+        <div class="d-mo">${e.d}</div>
+        <div class="d-n">${e.n}</div>
+        <div class="d-time">${e.time}</div>
+      </div>
+      <div class="body-col">
+        <div class="preview-title">${e.title}</div>
+        <div class="preview-text">${e.body}</div>
+      </div>
+      <div class="tagcol">
+        <span class="moodtag ${e.mood}">${e.moodLbl}</span>
+        <div class="meta-tags">${e.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+    `;
+    list.appendChild(el);
+  });
+
+  // Filter chips
+  document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+      chip.classList.add('on');
+    });
+  });
+</script>
+</body>
+</html>

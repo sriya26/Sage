@@ -26,6 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
     dateHeading.textContent = formattedDate + " entry";
     const isoDate = today.toISOString().slice(0, 10);
 
+    // Word count
+    const wordCountEl = document.getElementById("word-count");
+    journalInput.addEventListener("input", function () {
+        const words = journalInput.value.trim().split(/\s+/).filter(Boolean).length;
+        wordCountEl.textContent = words === 0 ? "0 words" : `${words} word${words === 1 ? "" : "s"}`;
+    });
+
     // Submit handler
     submitBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -77,8 +84,11 @@ document.addEventListener("DOMContentLoaded", function () {
         card.id = "reflection-card";
         card.className = "reflection-card";
         card.innerHTML = `
-            <p class="reflection-heading">Reflect on this</p>
-            <p class="reflection-text">${prompt}</p>
+            <div class="sage-avatar">S</div>
+            <div class="sage-bubble-content">
+                <span class="sage-who">Sage · reflect on this</span>
+                <p class="sage-prompt-text">${prompt}</p>
+            </div>
         `;
         document.querySelector(".container").appendChild(card);
     }
