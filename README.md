@@ -13,6 +13,7 @@ Sage is a web-based mental wellness companion designed to help users track emoti
 - 👤 **Profile & Dashboard**: Personal profile page showing your photo, name, and four stat cards (total entries, this month, day streak, top emotion), plus a mood breakdown donut chart and recent entries list.
 - 📖 **Entry Detail View**: Tap any journal entry to open the full text in a dedicated page styled to match the journal page.
 - 🔎 **Pattern Insights**: Pandas-powered analysis of the last 90 days surfaces four personal insights — peak anxiety day/time, longest low-mood streak, dominant emotion this week, and week-over-week mood trend — displayed as a row of cards on the dashboard.
+- 🎙️ **Voice Journaling**: Record a voice entry directly in the journal page. A LangGraph pipeline transcribes it with Whisper (local, no API key), classifies the text emotion with DistilRoBERTa, and extracts audio features (speech rate, pitch, energy) with librosa to infer a separate voice-tone emotion. When the two signals disagree — e.g. your words sound positive but your voice is flat — a conflict is detected and Ollama generates a nuanced, empathetic response acknowledging both layers. A ChromaDB CBT prompt is always returned. All results appear in a structured voice journal card below the text box.
 - 🎶 **Therapy Recommendations**: Contextual resource suggestions (calming music, breathing exercises, grounding articles, uplifting videos) surfaced automatically based on detected emotion.
 - 🔒 **Secure Authentication**
 - 💬 **Connect with a Therapist**: Suggests options to seek professional help based on user mood triggers (coming soon).
@@ -35,6 +36,7 @@ Sage is a web-based mental wellness companion designed to help users track emoti
 - Flask
 - MongoDB (running as a background service)
 - Ollama with the `llama3.2` model
+- ffmpeg (for voice audio conversion)
 
 ### Installation
 
@@ -44,6 +46,12 @@ cd Sage
 pyenv virtualenv 3.11.7 sage-env
 pyenv local sage-env
 pip install -r requirements.txt
+```
+
+### ffmpeg Setup
+
+```bash
+brew install ffmpeg
 ```
 
 ### Ollama Setup
@@ -97,6 +105,30 @@ The vector store is built on first run and reloaded on subsequent restarts — n
 
 ---
 
+## 🎙️ Voice Journaling Pipeline
+
+`voice_pipeline.py` implements the full voice entry flow as a **LangGraph** state graph. Each step is a discrete node; the graph branches after conflict detection.
+
+```
+transcribe → classify_text → extract_audio → detect_conflict → rag_prompt ──┬──(conflict)──→ ollama → END
+                                                                              └──(no conflict)──────────→ END
+```
+
+| Node | Tool | Output |
+|---|---|---|
+| `transcribe` | openai-whisper (base, local) | `transcript` |
+| `classify_text` | DistilRoBERTa via HuggingFace | `text_emotion` |
+| `extract_audio` | librosa onset/piptrack/RMS | `features`, `audio_emotion` |
+| `detect_conflict` | Rule-based valence lookup | `conflict` message or `None` |
+| `rag_prompt` | ChromaDB nearest-neighbour | `suggested_prompt` |
+| `ollama` | Llama 3.2 (conditional) | `ollama_response` |
+
+**Conflict detection** buckets the text emotion into `positive` / `neutral` / `negative` and compares it against the audio-inferred tone (`calm`, `anxious`, `angry`, `sad`). Disagreements produce a specific empathetic message and trigger the Ollama node for a deeper, personalised response.
+
+The Whisper model and compiled graph are both lazy-loaded and cached — no reload cost after the first request.
+
+---
+
 ## 📈 Pattern Analysis
 
 `analysis/pattern_analysis.py` queries the last 90 days of journal entries and runs four functions over a pandas DataFrame:
@@ -117,6 +149,7 @@ Results are served by the `/insights` route and rendered as a row of cards on th
 ```
 Sage/
 ├── app.py
+├── voice_pipeline.py       ← LangGraph voice journaling pipeline
 ├── requirements.txt
 ├── rag/
 │   ├── rag_prompts.py
@@ -161,6 +194,9 @@ This project is licensed under the [MIT License](LICENSE).
 * Hugging Face Transformers & j-hartmann/emotion-english-distilroberta-base for emotion recognition
 * PyTorch for model inference
 * sentence-transformers (all-MiniLM-L6-v2) & ChromaDB for RAG reflection prompts
+* openai-whisper for local audio transcription
+* librosa for audio feature extraction (speech rate, pitch, energy)
+* LangGraph for orchestrating the voice journaling pipeline
 * pandas for pattern analysis and mood trend computation
 * Chart.js for mood visualisations
 * MongoDB for local data storage
