@@ -10,8 +10,10 @@ import bcrypt
 import base64
 import os
 import json
+import tempfile
 from rag.rag_prompts import get_prompt_for_emotion
 from analysis.pattern_analysis import generate_insights
+from voice_pipeline import process_voice_entry
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS to connect frontend to backend
@@ -328,6 +330,27 @@ def insights():
     if not user_email:
         return jsonify({"error": "Email required"}), 400
     return jsonify(generate_insights(user_email))
+
+
+@app.route("/voice_journal", methods=["POST"])
+def voice_journal():
+    if "audio" not in request.files:
+        return jsonify({"error": "No audio file"}), 400
+
+    audio_file = request.files["audio"]
+    with tempfile.NamedTemporaryFile(suffix=".webm", delete=False) as tmp:
+        audio_file.save(tmp.name)
+        tmp_path = tmp.name
+
+    try:
+        result = process_voice_entry(tmp_path, emotion_prediction)
+        return jsonify(result)
+    except Exception as e:
+        print("Voice pipeline error:", e)
+        return jsonify({"error": str(e)}), 500
+    finally:
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)
 
 
 if __name__ == "__main__":
