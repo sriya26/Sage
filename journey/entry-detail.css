@@ -6,7 +6,7 @@
 body {
   margin: 0;
   font-family: 'Montserrat', sans-serif;
-  background-color: white;
+  background: radial-gradient(120% 80% at 50% -10%, #DBF0E7 0%, #EEF7F2 40%, #fff 100%);
   position: relative;
   min-height: 100vh;
   overflow-x: hidden;
@@ -21,7 +21,7 @@ body {
 }
 
 .title {
-  font-family: 'Chloe', serif;
+  font-family: 'DM Serif Display', 'Chloe', serif;
   font-size: 32px;
   color: #254e72;
   margin-bottom: 12px;
@@ -43,8 +43,8 @@ body {
 
 .emotion-badge.emotion-joy      { background-color: #7ddc7a; }
 .emotion-badge.emotion-sadness  { background-color: #f39c12; }
-.emotion-badge.emotion-anger,
-.emotion-badge.emotion-fear     { background-color: #e74c3c; }
+.emotion-badge.emotion-anger    { background-color: #e74c3c; }
+.emotion-badge.emotion-fear     { background-color: #9b59b6; }
 .emotion-badge.emotion-surprise { background-color: #f1c40f; }
 .emotion-badge.emotion-disgust  { background-color: #e67e22; }
 .emotion-badge.emotion-neutral  { background-color: #90b4ce; }
@@ -98,3 +98,129 @@ body {
   height: 40px;
   cursor: pointer;
 }
+
+.entry-attached-img {
+  display: block;
+  max-width: 90%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  border-radius: 16px;
+  margin: 0 auto 18px;
+  object-fit: contain;
+  box-shadow: 0 8px 24px -8px rgba(19, 56, 85, 0.18);
+}
+
+.bookmark-badge {
+  display: inline-block;
+  font-size: 12px;
+  color: #133855;
+  background: #EEF7F2;
+  border: 1px solid #C7E8DC;
+  border-radius: 999px;
+  padding: 4px 12px;
+  margin-left: 8px;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.delete-link {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(231, 76, 60, 0.07);
+  border: 1.5px solid rgba(231, 76, 60, 0.25);
+  color: #e74c3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.delete-link:hover {
+  background: rgba(231, 76, 60, 0.15);
+  border-color: rgba(231, 76, 60, 0.45);
+}
+
+/* ── Delete confirm modal ── */
+.confirm-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(19, 56, 85, 0.28);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.confirm-overlay.open { display: flex; }
+
+.confirm-modal {
+  background: #fff;
+  border-radius: 22px;
+  padding: 28px 24px 22px;
+  max-width: 300px;
+  width: 90%;
+  box-shadow: 0 32px 64px -16px rgba(19, 56, 85, 0.28);
+  text-align: center;
+}
+
+.confirm-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #133855;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0 0 6px;
+}
+
+.confirm-sub {
+  font-size: 12.5px;
+  color: #6b8caa;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0 0 22px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.confirm-cancel {
+  flex: 1;
+  padding: 11px;
+  border: 1.5px solid #c9daea;
+  border-radius: 13px;
+  background: transparent;
+  color: #254e72;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.confirm-cancel:hover { background: #f0f4f8; }
+
+.confirm-delete-btn {
+  flex: 1;
+  padding: 11px;
+  border: none;
+  border-radius: 13px;
+  background: #e74c3c;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.confirm-delete-btn:hover { background: #c0392b; }

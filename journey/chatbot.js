@@ -1,4 +1,4 @@
-const SESSION_ID = 'sage-' + Date.now();
+const SESSION_ID = 'sage-' + (localStorage.getItem('user_email') || Date.now());
 let welcomeShown = false;
 
 function toggleModal() {
@@ -24,10 +24,25 @@ function showWelcome() {
     false
   );
   showChips([
-    { label: "😔 Feeling sad",     action: 'send', value: "I'm feeling sad" },
-    { label: "😰 Feeling anxious", action: 'send', value: "I'm feeling anxious" },
-    { label: "😊 Feeling good",    action: 'send', value: "I'm feeling good" },
+    { label: "😔 Feeling sad",     action: 'send',     value: "I'm feeling sad" },
+    { label: "😰 Feeling anxious", action: 'send',     value: "I'm feeling anxious" },
+    { label: "😊 Feeling good",    action: 'send',     value: "I'm feeling good" },
+    { label: "🗺️ Explore Sage",    action: 'features' },
   ]);
+}
+
+function showFeatureGuide() {
+  appendBotMessage(
+    "Here's a quick tour of everything Sage offers — tap any feature to get started:",
+    true
+  );
+  setTimeout(() => showChips([
+    { label: "✍️ Write in journal",  action: 'navigate', value: '../journal/journal.html' },
+    { label: "🎙️ Voice journaling",  action: 'send',     value: "How does voice journaling work?" },
+    { label: "📊 Mood & patterns",   action: 'navigate', value: '../journey/journey.html' },
+    { label: "👤 Profile & stats",   action: 'navigate', value: '../profile/profile.html' },
+    { label: "🎵 Calming playlist",  action: 'open',     value: 'https://open.spotify.com/playlist/2pf4W9bfzSnbxqjaXEQUQy' },
+  ]), 900);
 }
 
 // ── Message helpers ────────────────────────────────────────────────────────
@@ -109,6 +124,10 @@ function showChips(chips) {
       document.querySelectorAll(".chat-chips").forEach(c => c.remove());
       if (chip.action === 'open') {
         window.open(chip.value, "_blank");
+      } else if (chip.action === 'navigate') {
+        window.location.href = chip.value;
+      } else if (chip.action === 'features') {
+        showFeatureGuide();
       } else {
         sendMessage(chip.value);
       }
@@ -133,7 +152,7 @@ function chipsForEmotion(type) {
   ];
   if (type === 'happy') return [
     { label: "Keep this going 🌟",   action: 'send', value: "How can I maintain this positive feeling?" },
-    { label: "Journal it ✍",         action: 'open', value: "../journal/journal.html" },
+    { label: "Journal it ✍",         action: 'navigate', value: "../journal/journal.html" },
     { label: "Upbeat Music 🎶",      action: 'open', value: "https://www.youtube.com/watch?v=ZbZSe6N_BXs" },
   ];
   return [

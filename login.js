@@ -1,13 +1,20 @@
 // login.js
-const authBox = document.getElementById('auth-box');
-const formTitle = document.getElementById('form-title');
-const loginForm = document.getElementById('login-form');
+const authBox    = document.getElementById('auth-box');
+const formTitle  = document.getElementById('form-title');
+const loginForm  = document.getElementById('login-form');
 const signupForm = document.getElementById('signup-form');
+const resetForm  = document.getElementById('reset-form');
 const showSignup = document.getElementById('show-signup');
-const showLogin = document.getElementById('show-login');
-const loginButton = document.getElementById('login-button');
+const showLogin  = document.getElementById('show-login');
+const loginButton  = document.getElementById('login-button');
 const signupButton = document.getElementById('signup-button');
-const messageBox = document.getElementById('message-box');
+const messageBox   = document.getElementById('message-box');
+
+function showForm(form, title) {
+  [loginForm, signupForm, resetForm].forEach(f => f.classList.add('hidden'));
+  form.classList.remove('hidden');
+  formTitle.textContent = title;
+}
 
 function showMessage(text, type) {
   messageBox.textContent = text;
@@ -19,16 +26,48 @@ function showMessage(text, type) {
 
 showSignup.addEventListener('click', function(e) {
   e.preventDefault();
-  formTitle.textContent = 'Sign Up';
-  loginForm.classList.add('hidden');
-  signupForm.classList.remove('hidden');
+  showForm(signupForm, 'Sign Up');
 });
 
 showLogin.addEventListener('click', function(e) {
   e.preventDefault();
-  formTitle.textContent = 'Welcome!';
-  signupForm.classList.add('hidden');
-  loginForm.classList.remove('hidden');
+  showForm(loginForm, 'Welcome Back!');
+});
+
+document.getElementById('show-reset').addEventListener('click', function(e) {
+  e.preventDefault();
+  showForm(resetForm, 'Reset Password');
+});
+
+document.getElementById('show-login-from-reset').addEventListener('click', function(e) {
+  e.preventDefault();
+  showForm(loginForm, 'Welcome Back!');
+});
+
+document.getElementById('reset-button').addEventListener('click', function() {
+  const email       = document.getElementById('reset-email').value.trim();
+  const newPassword = document.getElementById('reset-password').value.trim();
+
+  if (!email || !newPassword) {
+    showMessage('Please enter your email and a new password.', 'error');
+    return;
+  }
+
+  fetch('http://localhost:5001/reset_password', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, new_password: newPassword }),
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      showMessage('Password reset! Please log in.', 'success');
+      setTimeout(() => showForm(loginForm, 'Welcome Back!'), 1500);
+    } else {
+      showMessage(data.error || 'No account found with that email.', 'error');
+    }
+  })
+  .catch(err => console.error(err));
 });
 
 loginButton.addEventListener('click', function() {

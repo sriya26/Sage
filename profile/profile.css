@@ -207,11 +207,175 @@ body {
 
 .pill-joy      { background: #7ddc7a; }
 .pill-sadness  { background: #f39c12; }
-.pill-anger,
-.pill-fear     { background: #e74c3c; }
+.pill-anger    { background: #e74c3c; }
+.pill-fear     { background: #9b59b6; }
 .pill-surprise { background: #f1c40f; color: #333; }
 .pill-disgust  { background: #e67e22; }
 .pill-neutral  { background: #90b4ce; }
+
+/* ── Settings toggle button ──────────────────────────────── */
+.profile-card { position: relative; }
+
+.settings-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #f0f4f8;
+  border: 1.5px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #254e72;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.3s;
+}
+
+.settings-toggle:hover { background: #e2e8f0; }
+.settings-toggle.active { transform: rotate(60deg); background: #c0e8df; }
+
+/* ── Settings panel ──────────────────────────────────────── */
+.settings-card {
+  display: none;
+  animation: fadeInUp 0.25s ease;
+}
+
+.settings-card.open { display: block; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.settings-avatar-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.settings-avatar {
+  width: 64px;
+  height: 64px;
+  font-size: 24px;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.settings-avatar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.change-pic-btn {
+  display: inline-block;
+  background: #254e72;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: background 0.15s;
+  width: fit-content;
+}
+
+.change-pic-btn:hover { background: #1a3853; }
+
+#pic-input { display: none; }
+
+.pic-hint {
+  font-size: 11px;
+  color: #6b8caa;
+}
+
+.settings-field {
+  margin-bottom: 16px;
+}
+
+.settings-label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #254e72;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+
+.field-locked {
+  font-weight: 400;
+  color: #6b8caa;
+  font-size: 10.5px;
+}
+
+.settings-input {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #c9daea;
+  border-radius: 12px;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  color: #254e72;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #fff;
+}
+
+.settings-input:focus { border-color: #254e72; }
+
+.settings-input--locked {
+  background: #f7f9fc;
+  color: #6b8caa;
+  cursor: not-allowed;
+}
+
+.save-btn {
+  width: 100%;
+  padding: 12px;
+  background: #254e72;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-top: 4px;
+}
+
+.save-btn:hover { background: #1a3853; }
+.save-btn:disabled { background: #6b8caa; cursor: default; }
+
+.save-feedback {
+  text-align: center;
+  font-size: 12px;
+  margin: 8px 0 0;
+  min-height: 16px;
+  color: #2e7d52;
+}
+
+.signout-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  color: #c0392b;
+  border: 1.5px solid #e8c4c0;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Montserrat', sans-serif;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  margin-bottom: 20px;
+}
+
+.signout-btn:hover { background: #fdf2f2; border-color: #c0392b; }
 
 /* ── Nav (same as journey) ───────────────────────────────── */
 .bottom-nav {

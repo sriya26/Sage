@@ -26,12 +26,57 @@ document.addEventListener("DOMContentLoaded", function () {
     dateHeading.textContent = formattedDate + " entry";
     const isoDate = today.toISOString().slice(0, 10);
 
-    // Word count
+    // Word count + autosave dot
     const wordCountEl = document.getElementById("word-count");
+    const autosaveDot = document.getElementById("autosave-dot");
+    let autosaveTimer = null;
     journalInput.addEventListener("input", function () {
         const words = journalInput.value.trim().split(/\s+/).filter(Boolean).length;
-        wordCountEl.textContent = words === 0 ? "0 words" : `${words} word${words === 1 ? "" : "s"}`;
+        const label = words === 0 ? "0 words" : `${words} word${words === 1 ? "" : "s"}`;
+        wordCountEl.childNodes[wordCountEl.childNodes.length - 1].textContent = label;
+        autosaveDot.classList.remove("show");
+        clearTimeout(autosaveTimer);
+        if (words > 0) {
+            autosaveTimer = setTimeout(() => autosaveDot.classList.add("show"), 1500);
+        }
     });
+
+    // Live time + page count subtitle
+    const subtitleEl = document.getElementById("journal-subtitle");
+    let totalEntries = null;
+
+    function updateSubtitle() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+        const pageStr = totalEntries !== null ? ` · Page ${totalEntries + 1} of your journal` : '';
+        subtitleEl.textContent = timeStr + pageStr;
+    }
+
+    updateSubtitle();
+    setInterval(updateSubtitle, 60000);
+
+    // Fetch streak + entry count for top pill + subtitle
+    if (userEmail) {
+        fetch("http://localhost:5001/profile", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail }),
+        })
+        .then(r => r.json())
+        .then(data => {
+            if (data.stats) {
+                document.getElementById("streak-count").textContent = data.stats.streak ?? "—";
+                totalEntries = data.stats.total ?? null;
+                updateSubtitle();
+                if (data.stats.dominant_emotion) {
+                    const moodEmoji = { joy: "😊", sadness: "😔", fear: "😰", anger: "😤", disgust: "😣", surprise: "😲", neutral: "😐" };
+                    const e = data.stats.dominant_emotion.toLowerCase();
+                    document.getElementById("mood-stamp").textContent = `${moodEmoji[e] || "✦"} ${e.toUpperCase()}`;
+                }
+            }
+        })
+        .catch(() => {});
+    }
 
     // Voice recording
     const voiceBtn = document.getElementById("voice-btn");
@@ -68,7 +113,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (data.transcript) {
                             journalInput.value = data.transcript;
                             const words = journalInput.value.trim().split(/\s+/).filter(Boolean).length;
-                            wordCountEl.textContent = `${words} word${words === 1 ? "" : "s"}`;
+                            wordCountEl.childNodes[wordCountEl.childNodes.length - 1].textContent = `${words} word${words === 1 ? "" : "s"}`;
                             showVoiceResultCard(data);
                         }
                     } catch (err) {
@@ -133,6 +178,59 @@ document.addEventListener("DOMContentLoaded", function () {
         document.querySelector(".container").appendChild(card);
     }
 
+    // ── Image attachment ──────────────────────────────────────────────
+    const imgBtn         = document.getElementById("img-btn");
+    const imgInput       = document.getElementById("img-input");
+    const imgPreviewArea = document.getElementById("img-preview-area");
+    const imgPreview     = document.getElementById("img-preview");
+    const imgRemoveBtn   = document.getElementById("img-remove-btn");
+    let attachedImage    = null; // base64 string
+
+    imgBtn.addEventListener("click", () => imgInput.click());
+
+    imgInput.addEventListener("change", () => {
+        const file = imgInput.files[0];
+        if (!file) return;
+        // Resize to max 1024px and compress before storing
+        const reader = new FileReader();
+        reader.onload = e => {
+            const src = e.target.result;
+            const img = new Image();
+            img.onload = () => {
+                const MAX = 1024;
+                const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+                const canvas = document.createElement("canvas");
+                canvas.width  = img.width  * scale;
+                canvas.height = img.height * scale;
+                canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+                attachedImage = canvas.toDataURL("image/jpeg", 0.75);
+                imgPreview.src = attachedImage;
+                imgPreviewArea.classList.add("show");
+                imgBtn.style.color = "#133855";
+            };
+            img.src = src;
+        };
+        reader.readAsDataURL(file);
+        imgInput.value = "";
+    });
+
+    imgRemoveBtn.addEventListener("click", () => {
+        attachedImage = null;
+        imgPreview.src = "";
+        imgPreviewArea.classList.remove("show");
+        imgBtn.style.color = "";
+    });
+
+    // ── Bookmark toggle ───────────────────────────────────────────────
+    const bookmarkBtn  = document.getElementById("bookmark-btn");
+    let   isBookmarked = false;
+
+    bookmarkBtn.addEventListener("click", () => {
+        isBookmarked = !isBookmarked;
+        bookmarkBtn.classList.toggle("bookmarked", isBookmarked);
+        bookmarkBtn.title = isBookmarked ? "Bookmarked" : "Bookmark this entry";
+    });
+
     // Submit handler
     submitBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -155,7 +253,9 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify({
                 entry: entry,
                 date: isoDate,
-                email: userEmail
+                email: userEmail,
+                image: attachedImage || null,
+                bookmarked: isBookmarked,
             })
         })
         .then(res => res.json())
@@ -163,11 +263,28 @@ document.addEventListener("DOMContentLoaded", function () {
             analysing.classList.remove("show");
             successMsg.classList.add("show");
             journalInput.value = "";
+            // Reset image + bookmark state
+            attachedImage = null;
+            imgPreview.src = "";
+            imgPreviewArea.classList.remove("show");
+            imgBtn.style.color = "";
+            isBookmarked = false;
+            bookmarkBtn.classList.remove("bookmarked");
+            bookmarkBtn.title = "Bookmark this entry";
             setTimeout(() => {
                 successMsg.classList.remove("show");
             }, 3000);
             if (data.suggested_prompt) {
                 showReflectionCard(data.suggested_prompt);
+            }
+            // Update mood stamp with detected emotion
+            if (data.message) {
+                const match = data.message.match(/emotion: (\w+)/i);
+                if (match) {
+                    const moodEmoji = { joy: "😊", sadness: "😔", fear: "😰", anger: "😤", disgust: "😣", surprise: "😲", neutral: "😐" };
+                    const e = match[1].toLowerCase();
+                    document.getElementById("mood-stamp").textContent = `${moodEmoji[e] || "✦"} ${e.toUpperCase()}`;
+                }
             }
         })
         .catch(err => {

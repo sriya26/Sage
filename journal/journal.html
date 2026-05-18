@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sage | Journal</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="journal.css" />
   <link rel="stylesheet" href="../journey/chatbot.css" />
@@ -23,6 +23,15 @@
     ⏳ Analysing...
   </div>
 
+  <!-- Top-right pills: mood stamp + streak -->
+  <div class="top-pills">
+    <span class="mood-stamp" id="mood-stamp">✦ TODAY</span>
+    <span class="streak-pill">
+      <span class="streak-dot"></span>
+      <span id="streak-count">—</span> day streak
+    </span>
+  </div>
+
   <a href="../journey/journey.html" class="home-link">
     <svg class="home-icon" viewBox="0 0 24 24" fill="none" stroke="#254e72" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
       <polyline points="3 12 12 3 21 12"/>
@@ -32,10 +41,19 @@
 
   <div class="container">
     <h1 class="title" id="date-heading"></h1>
+    <p class="journal-subtitle" id="journal-subtitle"></p>
+
+    <!-- Breathing pulse decoration -->
+    <div class="breathing-pulse" aria-hidden="true"></div>
 
     <form id="journal-form">
       <div class="entry-box">
         <textarea id="journal-entry" placeholder="Write your thoughts here..."></textarea>
+        <!-- Image preview area -->
+        <div class="img-preview-area" id="img-preview-area">
+          <img id="img-preview" class="img-preview" alt="Attached photo" />
+          <button type="button" class="img-remove-btn" id="img-remove-btn" title="Remove photo">×</button>
+        </div>
         <div class="editor-footer">
           <div class="footer-left">
             <div class="footer-icon" id="voice-btn" title="Voice memo">
@@ -48,22 +66,23 @@
               <span class="recording-dot"></span>
               Recording…
             </div>
-            <div class="footer-icon" title="Add photo">
+            <div class="footer-icon" id="img-btn" title="Add photo">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="4" width="18" height="16" rx="2"/>
                 <circle cx="9" cy="10" r="2"/>
                 <path d="M21 16l-5-5-9 9"/>
               </svg>
             </div>
-            <div class="footer-icon" title="Tag">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <div class="footer-icon" id="bookmark-btn" title="Bookmark this entry">
+              <svg id="bookmark-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M6 4h12v17l-6-4-6 4V4z"/>
               </svg>
             </div>
           </div>
-          <span id="word-count">0 words</span>
+          <span id="word-count"><span class="autosave-dot" id="autosave-dot"></span>0 words</span>
         </div>
       </div>
+      <input type="file" id="img-input" accept="image/*" style="display:none">
       <button type="submit" class="submit-button" id="submit-btn">Submit</button>
     </form>
 

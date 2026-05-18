@@ -1,4 +1,4 @@
-from bson import Binary
+from bson import Binary, ObjectId
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -30,10 +30,6 @@ SYSTEM_PROMPT = (
     "When a user seems happy or positive, naturally mention 'upbeat music' or suggest they 'write in your journal'."
 )
 
-# session_id -> list of {role, content} message dicts
-chat_sessions = {}
-
-
 #load the ml model pipeline
 emotion_prediction = pipeline(
     "text-classification",
@@ -46,6 +42,7 @@ client = MongoClient("mongodb://localhost:27017/")
 db = client["sage_db"]
 journal_collection = db["journal_entries"]
 user_details = db["user_details"]
+chat_sessions_col = db["chat_sessions"]
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -81,6 +78,21 @@ def signup():
     return jsonify({'success': True})
 
 
+@app.route('/reset_password', methods=['POST'])
+def reset_password():
+    data = request.get_json()
+    email = data.get('email', '').strip()
+    new_password = data.get('new_password', '').strip()
+    if not email or not new_password:
+        return jsonify({'success': False, 'error': 'Email and new password required'}), 400
+    user = user_details.find_one({'email': email})
+    if not user:
+        return jsonify({'success': False, 'error': 'No account with that email'})
+    hashed = bcrypt.hashpw(new_password.encode(), bcrypt.gensalt())
+    user_details.update_one({'email': email}, {'$set': {'password': hashed}})
+    return jsonify({'success': True})
+
+
 @app.route("/submit_journal", methods=["POST"])
 def submit_journal():
     data = request.get_json()
@@ -103,7 +115,9 @@ def submit_journal():
         "user_email": user_email,
         "entry": entry_text,
         "date": date,
-        "emotion": emotion
+        "emotion": emotion,
+        "image": data.get("image"),
+        "bookmarked": data.get("bookmarked", False),
     })
 
     suggested_prompt = get_prompt_for_emotion(emotion)
@@ -120,7 +134,9 @@ def get_journals():
     if not user_email:
         return jsonify({"error": "User email required"}), 400
 
-    entries = list(journal_collection.find({"user_email": user_email}, {"_id": 0}))
+    entries = list(journal_collection.find({"user_email": user_email}, {"image": 0}).sort("date", -1))
+    for e in entries:
+        e['_id'] = str(e['_id'])
     return jsonify(entries), 200
 
 
@@ -226,7 +242,9 @@ def profile():
     if not user:
         return jsonify({"error": "User not found"}), 404
 
-    entries = list(journal_collection.find({"user_email": user_email}, {"_id": 0}))
+    entries = list(journal_collection.find({"user_email": user_email}))
+    for e in entries:
+        e['_id'] = str(e['_id'])
 
     DATE_FORMATS = ["%Y-%m-%d", "%B %d, %Y", "%Y-%m-%d %H:%M:%S"]
     def parse_date(s):
@@ -266,11 +284,11 @@ def profile():
     if user.get("picture"):
         picture_url = "data:image/jpeg;base64," + base64.b64encode(bytes(user["picture"])).decode()
 
-    recent = sorted(
-        [e for e in entries if parse_date(e.get("date", ""))],
-        key=lambda e: parse_date(e["date"]),
-        reverse=True
-    )[:5]
+    dated = [e for e in entries if parse_date(e.get("date", ""))]
+    dated_sorted = sorted(dated, key=lambda e: parse_date(e["date"]), reverse=True)
+
+    recent = dated_sorted[:5]
+    bookmarked = [e for e in dated_sorted if e.get("bookmarked", False)]
 
     return jsonify({
         "name": user.get("name"),
@@ -285,6 +303,7 @@ def profile():
             "emotion_counts": emotion_counts,
         },
         "recent_entries": recent,
+        "bookmarked_entries": bookmarked,
     })
 
 
@@ -301,7 +320,8 @@ def chat_with_sage():
     if not user_input:
         return jsonify({"reply": ""}), 200
 
-    history = chat_sessions.setdefault(session_id, [])
+    doc = chat_sessions_col.find_one({"session_id": session_id})
+    history = doc["messages"] if doc else []
     history.append({"role": "user", "content": user_input})
 
     try:
@@ -312,14 +332,18 @@ def chat_with_sage():
         reply = response["message"]["content"]
         history.append({"role": "assistant", "content": reply})
 
-        # Keep history bounded to last 20 turns
         if len(history) > 20:
-            chat_sessions[session_id] = history[-20:]
+            history = history[-20:]
+
+        chat_sessions_col.update_one(
+            {"session_id": session_id},
+            {"$set": {"messages": history, "updated_at": datetime.now()}},
+            upsert=True,
+        )
 
         return jsonify({"reply": reply})
     except Exception as e:
         print("Ollama error:", e)
-        history.pop()  # remove the user message we optimistically added
         return jsonify({"reply": "I'm having trouble connecting right now. Please try again shortly."}), 500
 
 
@@ -330,6 +354,54 @@ def insights():
     if not user_email:
         return jsonify({"error": "Email required"}), 400
     return jsonify(generate_insights(user_email))
+
+
+@app.route("/update_profile", methods=["POST"])
+def update_profile():
+    email = request.form.get("email")
+    if not email:
+        return jsonify({"error": "Email required"}), 400
+
+    update = {}
+    name = request.form.get("name", "").strip()
+    if name:
+        update["name"] = name
+
+    picture = request.files.get("picture")
+    if picture:
+        update["picture"] = Binary(picture.read())
+
+    if update:
+        user_details.update_one({"email": email}, {"$set": update})
+
+    return jsonify({"success": True})
+
+
+@app.route("/get_entry", methods=["POST"])
+def get_entry():
+    data = request.get_json()
+    entry_id = data.get("entry_id")
+    user_email = data.get("email")
+    if not entry_id or not user_email:
+        return jsonify({"error": "entry_id and email required"}), 400
+    entry = journal_collection.find_one({"_id": ObjectId(entry_id), "user_email": user_email})
+    if not entry:
+        return jsonify({"error": "Not found"}), 404
+    entry['_id'] = str(entry['_id'])
+    return jsonify(entry)
+
+
+@app.route("/delete_entry", methods=["POST"])
+def delete_entry():
+    data = request.get_json()
+    entry_id = data.get("entry_id")
+    user_email = data.get("email")
+    if not entry_id or not user_email:
+        return jsonify({"error": "entry_id and email required"}), 400
+    result = journal_collection.delete_one({"_id": ObjectId(entry_id), "user_email": user_email})
+    if result.deleted_count == 0:
+        return jsonify({"error": "Entry not found"}), 404
+    return jsonify({"success": True})
 
 
 @app.route("/voice_journal", methods=["POST"])

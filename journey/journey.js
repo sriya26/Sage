@@ -55,22 +55,36 @@ function updateGreeting(journalData) {
 }
 
 // ── Week calendar ─────────────────────────────────────────────────────
-function renderWeekCalendar(journalData) {
+let _weekOffset = 0;   // 0 = current week, -1 = last week, +1 = next week
+let _calJournalData = [];
+
+function renderWeekCalendar(journalData, offset) {
+  if (journalData !== undefined) _calJournalData = journalData;
+  if (offset !== undefined) _weekOffset = offset;
+
   const section = document.getElementById('week-calendar');
   section.classList.remove('hidden');
 
   const entryMap = {};
-  journalData.forEach(e => {
+  _calJournalData.forEach(e => {
     if (e.date) entryMap[e.date.slice(0, 10)] = e.emotion;
   });
 
   const now = new Date();
-  const dow = now.getDay();                              // 0 = Sun
-  const diff = dow === 0 ? -6 : 1 - dow;               // shift to Monday
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff);
+  const dow = now.getDay();
+  const diff = dow === 0 ? -6 : 1 - dow;
+  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate() + diff + _weekOffset * 7);
 
+  // Label: week range e.g. "May 12 – 18, 2026"
+  const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+  const fmt = d => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  const yearLabel = sunday.getFullYear();
   document.getElementById('weekcal-month').textContent =
-    now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    `${fmt(monday)} – ${sunday.getDate()}, ${yearLabel}`;
+
+  // Disable next button if we're on current or future week
+  const nextBtn = document.getElementById('weekcal-next');
+  if (nextBtn) nextBtn.disabled = _weekOffset >= 0;
 
   const grid = document.getElementById('weekcal-grid');
   grid.innerHTML = '';
@@ -103,10 +117,148 @@ function renderWeekCalendar(journalData) {
 }
 
 // ── Entry list (day-stub format) ──────────────────────────────────────
+const _shortDays   = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const _shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+let _activeFilter = 'all';
+let _searchQuery  = '';
+
+function buildEntryEl(entry) {
+  const rawDate = entry.date;
+  let dayName = '', dayNum = '', monthName = '';
+
+  if (rawDate && typeof rawDate === 'string') {
+    const iso = rawDate.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+      const [y, m, d] = iso.split('-').map(Number);
+      const dateObj   = new Date(y, m - 1, d);
+      if (!isNaN(dateObj.getTime())) {
+        dayName   = _shortDays[dateObj.getDay()];
+        dayNum    = d;
+        monthName = _shortMonths[m - 1];
+      }
+    }
+  }
+  if (!dayName && rawDate) {
+    const dateObj = new Date(rawDate);
+    if (!isNaN(dateObj.getTime())) {
+      dayName   = _shortDays[dateObj.getDay()];
+      dayNum    = dateObj.getDate();
+      monthName = _shortMonths[dateObj.getMonth()];
+    }
+  }
+
+  const emotion = entry.emotion ? entry.emotion.toLowerCase() : 'neutral';
+  const color   = EMOTION_COLOR[emotion] ?? '#ccc';
+  const snip    = entry.entry.length > 90 ? entry.entry.slice(0, 90) + '…' : entry.entry;
+
+  const el = document.createElement('div');
+  el.className = 'entry-new';
+
+  const dayStub = document.createElement('div');
+  dayStub.className = 'day-stub';
+  dayStub.innerHTML = `<span class="wday-s">${dayName}</span><span class="wdate-s">${dayNum}</span><span class="wmonth-s">${monthName}</span>`;
+
+  const bodyCol = document.createElement('div');
+  bodyCol.className = 'entry-body-col';
+  if (entry.bookmarked) {
+    const bm = document.createElement('span');
+    bm.className = 'entry-bookmark-dot';
+    bm.title = 'Bookmarked';
+    bodyCol.appendChild(bm);
+  }
+  const snipEl = document.createElement('p');
+  snipEl.className = 'entry-snip';
+  snipEl.textContent = snip;
+  bodyCol.appendChild(snipEl);
+
+  const moodtag = document.createElement('span');
+  moodtag.className = 'moodtag';
+  moodtag.style.background = color;
+  moodtag.textContent = emotion;
+
+  const delBtn = document.createElement('button');
+  delBtn.className = 'del-btn';
+  delBtn.title = 'Delete entry';
+  delBtn.setAttribute('aria-label', 'Delete entry');
+  delBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>`;
+  delBtn.addEventListener('click', async e => {
+    e.stopPropagation();
+    const ok = await showConfirm();
+    if (ok) deleteEntry(entry._id);
+  });
+
+  const rightCol = document.createElement('div');
+  rightCol.className = 'entry-right';
+  rightCol.appendChild(moodtag);
+  rightCol.appendChild(delBtn);
+
+  el.appendChild(dayStub);
+  el.appendChild(bodyCol);
+  el.appendChild(rightCol);
+
+  el.addEventListener('click', () => {
+    localStorage.setItem('selected_entry', JSON.stringify(entry));
+    window.location.href = 'entry-detail.html';
+  });
+
+  return el;
+}
+
+function renderFilteredEntries(journalData) {
+  const container = document.getElementById('entries-container');
+  container.innerHTML = '';
+  let filtered = _activeFilter === 'all'
+    ? journalData
+    : journalData.filter(e => (e.emotion || 'neutral').toLowerCase() === _activeFilter);
+  if (_searchQuery) {
+    const q = _searchQuery.toLowerCase();
+    filtered = filtered.filter(e => (e.entry || '').toLowerCase().includes(q));
+  }
+  if (!filtered.length) {
+    container.innerHTML = '<p style="color:#6b8caa;font-size:13px;padding:8px 2px;">No entries found.</p>';
+    return;
+  }
+  filtered.forEach(entry => container.appendChild(buildEntryEl(entry)));
+}
+
+function buildFilterBar(journalData) {
+  const bar = document.getElementById('emotion-filter-bar');
+  bar.innerHTML = '';
+
+  const emotions = [...new Set(journalData.map(e => (e.emotion || 'neutral').toLowerCase()))];
+  if (emotions.length < 2) return;
+
+  const chips = [{ key: 'all', label: 'All' }, ...emotions.map(em => ({
+    key: em,
+    label: em.charAt(0).toUpperCase() + em.slice(1),
+  }))];
+
+  chips.forEach(({ key, label }) => {
+    const btn = document.createElement('button');
+    btn.className = 'filter-chip' + (key === _activeFilter ? ' active' : '');
+    if (key !== 'all') btn.style.setProperty('--chip-color', EMOTION_COLOR[key] ?? '#90b4ce');
+
+    if (key !== 'all') {
+      const dot = document.createElement('span');
+      dot.className = 'filter-dot';
+      btn.appendChild(dot);
+    }
+    btn.appendChild(document.createTextNode(label));
+
+    btn.addEventListener('click', () => {
+      _activeFilter = key;
+      bar.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      renderFilteredEntries(journalData);
+    });
+
+    bar.appendChild(btn);
+  });
+}
+
 function renderEntries(journalData) {
-  const entriesBlock  = document.getElementById('entries-block');
+  const entriesBlock   = document.getElementById('entries-block');
   const defaultSection = document.getElementById('default-section');
-  const container     = document.getElementById('entries-container');
 
   if (!journalData || !journalData.length) {
     defaultSection.classList.remove('hidden');
@@ -115,54 +267,56 @@ function renderEntries(journalData) {
 
   defaultSection.classList.add('hidden');
   entriesBlock.classList.remove('hidden');
+  _activeFilter = 'all';
+  _searchQuery  = '';
 
-  const shortDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  buildFilterBar(journalData);
+  renderFilteredEntries(journalData);
 
-  journalData.forEach(entry => {
-    const rawDate = entry.date;
-    let dayName = '', dayNum = '';
+  const searchInput = document.getElementById('entries-search');
+  if (searchInput) {
+    searchInput.value = '';
+    searchInput.oninput = () => {
+      _searchQuery = searchInput.value.trim();
+      renderFilteredEntries(journalData);
+    };
+  }
+}
 
-    if (rawDate && typeof rawDate === 'string') {
-      const iso = rawDate.slice(0, 10);
-      if (/^\d{4}-\d{2}-\d{2}$/.test(iso)) {
-        const [y, m, d] = iso.split('-').map(Number);
-        const dateObj   = new Date(y, m - 1, d);
-        if (!isNaN(dateObj.getTime())) {
-          dayName = shortDays[dateObj.getDay()];
-          dayNum  = d;
-        }
-      }
+// ── Custom confirm ────────────────────────────────────────────────────
+function showConfirm() {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirmOverlay');
+    overlay.classList.add('open');
+
+    function onConfirm() { cleanup(); resolve(true); }
+    function onCancel()  { cleanup(); resolve(false); }
+
+    function cleanup() {
+      overlay.classList.remove('open');
+      document.getElementById('confirmDelete').removeEventListener('click', onConfirm);
+      document.getElementById('confirmCancel').removeEventListener('click', onCancel);
     }
-    if (!dayName && rawDate) {
-      const dateObj = new Date(rawDate);
-      if (!isNaN(dateObj.getTime())) {
-        dayName = shortDays[dateObj.getDay()];
-        dayNum  = dateObj.getDate();
-      }
-    }
 
-    const emotion = entry.emotion ? entry.emotion.toLowerCase() : 'neutral';
-    const color   = EMOTION_COLOR[emotion] ?? '#ccc';
-    const snip    = entry.entry.length > 90 ? entry.entry.slice(0, 90) + '…' : entry.entry;
-
-    const el = document.createElement('div');
-    el.className = 'entry-new';
-    el.innerHTML = `
-      <div class="day-stub">
-        <span class="wday-s">${dayName}</span>
-        <span class="wdate-s">${dayNum}</span>
-      </div>
-      <div class="entry-body-col">
-        <p class="entry-snip">${snip}</p>
-      </div>
-      <span class="moodtag" style="background:${color}">${emotion}</span>
-    `;
-    el.addEventListener('click', () => {
-      localStorage.setItem('selected_entry', JSON.stringify(entry));
-      window.location.href = 'entry-detail.html';
-    });
-    container.appendChild(el);
+    document.getElementById('confirmDelete').addEventListener('click', onConfirm);
+    document.getElementById('confirmCancel').addEventListener('click', onCancel);
   });
+}
+
+// ── Delete entry ──────────────────────────────────────────────────────
+async function deleteEntry(id) {
+  const email = localStorage.getItem('user_email');
+  try {
+    const res = await fetch('http://localhost:5001/delete_entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry_id: id, email }),
+    });
+    const data = await res.json();
+    if (data.success) window.location.reload();
+  } catch (err) {
+    console.error('Delete error:', err);
+  }
 }
 
 // ── Mood chart ────────────────────────────────────────────────────────
@@ -368,6 +522,10 @@ document.addEventListener('DOMContentLoaded', function () {
     return;
   }
 
+  // Week calendar prev/next navigation
+  document.getElementById('weekcal-prev').addEventListener('click', () => renderWeekCalendar(undefined, _weekOffset - 1));
+  document.getElementById('weekcal-next').addEventListener('click', () => renderWeekCalendar(undefined, _weekOffset + 1));
+
   Promise.all([
     fetch('http://localhost:5001/mood_history', {
       method: 'POST',
@@ -395,6 +553,7 @@ document.addEventListener('DOMContentLoaded', function () {
   ])
   .then(([moodData, journalData, reportData, insightsData]) => {
     const jd = Array.isArray(journalData) ? journalData : [];
+    jd.sort((a, b) => new Date(b.date) - new Date(a.date));
     updateGreeting(jd);
     renderWeekCalendar(jd);
     renderEntries(jd);
