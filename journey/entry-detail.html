@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sage | Entry</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="entry-detail.css" />
 </head>
@@ -16,6 +16,15 @@
       <path d="M5 10v9a1 1 0 001 1h4v-5h4v5h4a1 1 0 001-1v-9"/>
     </svg>
   </a>
+
+  <button class="delete-link" id="delete-entry-btn" title="Delete entry">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20">
+      <polyline points="3 6 5 6 21 6"/>
+      <path d="M19 6l-1 14H6L5 6"/>
+      <path d="M10 11v6M14 11v6"/>
+      <path d="M9 6V4h6v2"/>
+    </svg>
+  </button>
 
   <div class="container">
     <h1 class="title" id="entry-date"></h1>
@@ -30,6 +39,18 @@
 
     <img src="../assets/light-blue.PNG" class="decor-left" />
     <img src="../assets/dark-blue.PNG" class="decor-right" />
+  </div>
+
+  <!-- Delete confirm modal -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-modal">
+      <p class="confirm-title">Delete entry?</p>
+      <p class="confirm-sub">This cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-delete-btn" id="confirmDelete">Delete</button>
+      </div>
+    </div>
   </div>
 
   <script src="entry-detail.js"></script>

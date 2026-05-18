@@ -35,9 +35,102 @@ document.addEventListener('DOMContentLoaded', () => {
       renderStats(data.stats);
       renderDonut(data.stats);
       renderRecentEntries(data.recent_entries);
+      renderBookmarkedEntries(data.bookmarked_entries);
+      initSettings(data);
     })
     .catch(err => console.error('Profile load error:', err));
 });
+
+function initSettings({ name, email, picture }) {
+  const toggle      = document.getElementById('settings-toggle');
+  const panel       = document.getElementById('settings-section');
+  const nameInput   = document.getElementById('settings-name');
+  const emailInput  = document.getElementById('settings-email');
+  const picInput    = document.getElementById('pic-input');
+  const saveBtn     = document.getElementById('save-settings-btn');
+  const feedback    = document.getElementById('save-feedback');
+  const signoutBtn  = document.getElementById('signout-btn');
+  const settingsAv  = document.getElementById('settings-avatar');
+
+  // Populate fields
+  nameInput.value  = name  || '';
+  emailInput.value = email || '';
+
+  // Mirror avatar into settings panel
+  if (picture) {
+    const img = document.createElement('img');
+    img.src = picture;
+    settingsAv.appendChild(img);
+  } else {
+    settingsAv.textContent = (name || '?')[0].toUpperCase();
+  }
+
+  // Toggle settings panel
+  toggle.addEventListener('click', () => {
+    const isOpen = panel.classList.toggle('open');
+    toggle.classList.toggle('active', isOpen);
+  });
+
+  // Preview new photo locally before upload
+  picInput.addEventListener('change', () => {
+    const file = picInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      settingsAv.innerHTML = '';
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      settingsAv.appendChild(img);
+      // Also update main avatar preview
+      const mainAv = document.getElementById('avatar');
+      mainAv.innerHTML = '';
+      const img2 = document.createElement('img');
+      img2.src = e.target.result;
+      mainAv.appendChild(img2);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Save changes
+  saveBtn.addEventListener('click', async () => {
+    saveBtn.disabled = true;
+    feedback.textContent = '';
+
+    const formData = new FormData();
+    formData.append('email', email);
+
+    const newName = nameInput.value.trim();
+    if (newName && newName !== name) formData.append('name', newName);
+    if (picInput.files[0]) formData.append('picture', picInput.files[0]);
+
+    try {
+      const res  = await fetch('http://localhost:5001/update_profile', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (data.success) {
+        feedback.textContent = '✓ Saved successfully';
+        if (newName) {
+          document.getElementById('profile-name').textContent = newName;
+          const mainAv = document.getElementById('avatar');
+          if (!mainAv.querySelector('img')) mainAv.textContent = newName[0].toUpperCase();
+        }
+      } else {
+        feedback.style.color = '#c0392b';
+        feedback.textContent = 'Something went wrong.';
+      }
+    } catch {
+      feedback.style.color = '#c0392b';
+      feedback.textContent = 'Could not reach server.';
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+
+  // Sign out
+  signoutBtn.addEventListener('click', () => {
+    localStorage.removeItem('user_email');
+    window.location.href = '../index.html';
+  });
+}
 
 function renderProfile({ name, email, gender, picture }) {
   const avatar = document.getElementById('avatar');
@@ -138,6 +231,32 @@ function renderRecentEntries(entries) {
   const container = document.getElementById('recent-entries');
   if (!entries || !entries.length) {
     container.innerHTML = '<p style="color:#6b8caa;font-size:13px;">No entries yet.</p>';
+    return;
+  }
+
+  entries.forEach(entry => {
+    const em = (entry.emotion || 'neutral').toLowerCase();
+    const row = document.createElement('div');
+    row.className = 'recent-entry';
+    row.innerHTML = `
+      <div class="entry-meta">
+        <span class="entry-date-label">${formatDate(entry.date)}</span>
+        <span class="entry-preview-text">${entry.entry || ''}</span>
+      </div>
+      <span class="emotion-pill pill-${em}">${em}</span>
+    `;
+    row.addEventListener('click', () => {
+      localStorage.setItem('selected_entry', JSON.stringify(entry));
+      window.location.href = '../journey/entry-detail.html';
+    });
+    container.appendChild(row);
+  });
+}
+
+function renderBookmarkedEntries(entries) {
+  const container = document.getElementById('bookmarked-entries');
+  if (!entries || !entries.length) {
+    container.innerHTML = '<p style="color:#6b8caa;font-size:13px;">No saved entries yet. Tap the bookmark icon while writing to save an entry.</p>';
     return;
   }
 

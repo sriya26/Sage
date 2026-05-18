@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Sage | Start Your Journey</title>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;1,500&family=DM+Serif+Display:ital@0;1&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
   <link rel="stylesheet" href="journey.css">
 </head>
@@ -64,6 +64,14 @@
       <div id="week-calendar" class="weekcal hidden">
         <div class="weekcal-hd">
           <span id="weekcal-month" class="weekcal-mo"></span>
+          <div class="weekcal-nav">
+            <button class="weekcal-nav-btn" id="weekcal-prev" aria-label="Previous week">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M15 6l-6 6 6 6"/></svg>
+            </button>
+            <button class="weekcal-nav-btn" id="weekcal-next" aria-label="Next week">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><path d="M9 6l6 6-6 6"/></svg>
+            </button>
+          </div>
         </div>
         <div id="weekcal-grid" class="weekcal-grid"></div>
       </div>
@@ -71,7 +79,12 @@
       <div id="entries-block" class="entries-block hidden">
         <div class="entries-hd">
           <span class="entries-ttl">Recent entries</span>
+          <div class="entries-search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="13" height="13"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="entries-search" class="entries-search" placeholder="Search entries…" />
+          </div>
         </div>
+        <div id="emotion-filter-bar" class="emotion-filter-bar"></div>
         <div id="entries-container"></div>
       </div>
 
@@ -105,14 +118,24 @@
 
       <div id="insights-section" class="side-card hidden">
         <div class="card-hd">
-          <span class="card-ttl">Your Patterns</span>
+          <div class="card-hd-inner">
+            <span class="card-ic card-ic--cream">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+            </span>
+            <span class="card-ttl">Your Patterns</span>
+          </div>
         </div>
         <div id="insights-cards" class="plist"></div>
       </div>
 
       <div id="weekly-report-section" class="side-card hidden">
         <div class="card-hd">
-          <span class="card-ttl">Week in Review</span>
+          <div class="card-hd-inner">
+            <span class="card-ic card-ic--mint">
+              <svg viewBox="0 0 24 24" fill="currentColor" width="12" height="12"><path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zM19 14l.8 2.2L22 17l-2.2.8L19 20l-.8-2.2L16 17l2.2-.8L19 14z"/></svg>
+            </span>
+            <span class="card-ttl">Week in Review</span>
+          </div>
         </div>
         <p id="report-summary" class="report-summary"></p>
         <div id="report-bars" class="report-bars"></div>
@@ -174,6 +197,18 @@
     <div class="chatbot-input-area">
       <input type="text" id="chatInput" placeholder="Enter your message here" />
       <img src="../assets/send.PNG" alt="Send" class="send-icon" id="send-icon" onclick="sendMessage()">
+    </div>
+  </div>
+
+  <!-- Delete confirm modal -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-modal">
+      <p class="confirm-title">Delete entry?</p>
+      <p class="confirm-sub">This cannot be undone.</p>
+      <div class="confirm-actions">
+        <button class="confirm-cancel" id="confirmCancel">Cancel</button>
+        <button class="confirm-delete-btn" id="confirmDelete">Delete</button>
+      </div>
     </div>
   </div>
 

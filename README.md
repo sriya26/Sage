@@ -6,25 +6,20 @@ Sage is a web-based mental wellness companion designed to help users track emoti
 
 ## 💡 Features
 
-- 🤖 **AI Chatbot**: Conversational interface powered by a local Llama 3.2 model via Ollama — empathetic, context-aware, and fully offline. Remembers conversation history within a session and offers smart action chips to continue the chat or access resources.
-- 📝 **Emotion-Based Journaling**: Users can write journal entries with automatic emotion tagging using a DistilRoBERTa emotion recognition model built with PyTorch and Hugging Face Transformers. After each submission, a RAG pipeline (sentence-transformers + ChromaDB) retrieves a personalised CBT reflection prompt matched to the detected emotion.
+- 🤖 **AI Chatbot**: Conversational interface powered by a local Llama 3.2 model via Ollama — empathetic, context-aware, and fully offline. Conversation history is persisted to MongoDB so sessions survive server restarts. Offers smart action chips to continue the chat, navigate the app, or access resources.
+- 📝 **Emotion-Based Journaling**: Write journal entries with automatic emotion tagging using a DistilRoBERTa model. After each submission, a RAG pipeline (sentence-transformers + ChromaDB) retrieves a personalised CBT reflection prompt matched to the detected emotion. Supports photo attachments and bookmarking entries.
+- 🗑️ **Delete Entries**: Hover over any entry on the home page to reveal a trash icon, or use the delete button inside the entry detail view. A styled in-app confirmation modal prevents accidental deletions.
+- 🔍 **Entry Search**: Real-time search bar on the home page filters entries by text content, working in combination with the emotion filter chips.
+- 🎛️ **Dynamic Emotion Filter**: Home page entry list includes filter chips derived only from emotions actually present in the user's data — chips appear and disappear as new emotions are detected.
 - 📊 **Mood Timeline**: Line chart of the last 30 days of emotion data, with each point coloured by emotion and a labelled y-axis mapping emotions to a mood valence scale.
 - 📋 **Weekly Mood Report**: Auto-generated end-of-week summary showing emotion distribution bars and a natural-language sentence describing the week's emotional tone.
-- 👤 **Profile & Dashboard**: Personal profile page showing your photo, name, and four stat cards (total entries, this month, day streak, top emotion), plus a mood breakdown donut chart and recent entries list.
-- 📖 **Entry Detail View**: Tap any journal entry to open the full text in a dedicated page styled to match the journal page.
-- 🔎 **Pattern Insights**: Pandas-powered analysis of the last 90 days surfaces four personal insights — peak anxiety day/time, longest low-mood streak, dominant emotion this week, and week-over-week mood trend — displayed as a row of cards on the dashboard.
-- 🎙️ **Voice Journaling**: Record a voice entry directly in the journal page. A LangGraph pipeline transcribes it with Whisper (local, no API key), classifies the text emotion with DistilRoBERTa, and extracts audio features (speech rate, pitch, energy) with librosa to infer a separate voice-tone emotion. When the two signals disagree — e.g. your words sound positive but your voice is flat — a conflict is detected and Ollama generates a nuanced, empathetic response acknowledging both layers. A ChromaDB CBT prompt is always returned. All results appear in a structured voice journal card below the text box.
+- 👤 **Profile & Dashboard**: Personal profile page showing your photo, name, and stat cards (total entries, this month, day streak, top emotion), a mood breakdown donut chart, recent entries, and a dedicated Saved Entries section for bookmarked journal entries. Supports profile photo and name updates.
+- 📖 **Entry Detail View**: Tap any journal entry to open the full text, emotion badge, attached photo, and bookmark status in a dedicated page. Includes a delete button.
+- 🔎 **Pattern Insights**: Pandas-powered analysis of the last 90 days surfaces four personal insights — peak anxiety day/time, longest low-mood streak, dominant emotion this week, and week-over-week mood trend.
+- 🎙️ **Voice Journaling**: Record a voice entry directly in the journal page. A LangGraph pipeline transcribes it with Whisper (local, no API key), classifies the text emotion with DistilRoBERTa, and extracts audio features (speech rate, pitch, energy) with librosa to infer a separate voice-tone emotion. When the two signals disagree, a conflict is detected and Ollama generates a nuanced, empathetic response acknowledging both layers. All results appear in a structured voice journal card below the text box.
 - 🎶 **Therapy Recommendations**: Contextual resource suggestions (calming music, breathing exercises, grounding articles, uplifting videos) surfaced automatically based on detected emotion.
-- 🔒 **Secure Authentication**
-- 💬 **Connect with a Therapist**: Suggests options to seek professional help based on user mood triggers (coming soon).
-
----
-
-## 🖼️ Sample Screens
-
-<img src="assets/sample1.PNG" width="400"/>
-<img src="assets/sample2.png" width="400"/>
-<img src="assets/sample3.PNG" height="400"/>
+- 🔑 **Forgot Password**: Users can reset their password directly from the login page by entering their email and a new password — no email required.
+- 🔒 **Secure Authentication**: bcrypt-hashed passwords, email-based user identity stored in MongoDB.
 
 ---
 
@@ -88,7 +83,7 @@ Then open `index.html` in your browser. Flask runs on `http://localhost:5001`.
 
 ## 🧠 Local LLM (Ollama)
 
-Sage uses a locally running Llama 3.2 model via Ollama for the chatbot — no API key or internet connection required. The `/chat` route maintains per-session conversation history (up to 20 turns) and uses a system prompt that gives the model the Sage wellness persona.
+Sage uses a locally running Llama 3.2 model via Ollama for the chatbot — no API key or internet connection required. The `/chat` route loads and saves per-user conversation history (up to 20 turns) from MongoDB, so context persists across page reloads and server restarts. A system prompt gives the model the Sage wellness persona.
 
 ---
 
@@ -140,7 +135,7 @@ The Whisper model and compiled graph are both lazy-loaded and cached — no relo
 | `dominant_emotion_this_week` | Most frequent emotion in the last 7 days |
 | `mood_trend` | Week-over-week shift in average mood score (joy = 7 … anger = 1); returns `improving`, `declining`, or `stable` |
 
-Results are served by the `/insights` route and rendered as a row of cards on the journey dashboard. If the user has fewer than 7 entries, a friendly prompt is shown instead.
+Results are served by the `/insights` route and rendered on the journey dashboard. If the user has fewer than 7 entries, a friendly prompt is shown instead.
 
 ---
 
@@ -168,6 +163,7 @@ Sage/
 │   ├── journey.css
 │   ├── journey.js
 │   ├── chatbot.js
+│   ├── chatbot.css
 │   ├── entry-detail.html
 │   ├── entry-detail.css
 │   └── entry-detail.js

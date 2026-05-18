@@ -3,9 +3,8 @@ import pandas as pd
 from datetime import datetime, timedelta
 from pymongo import MongoClient
 
-client = MongoClient("mongodb://localhost:27017/")
-db = client["sage_db"]
-journal_collection = db["journal_entries"]
+_client = MongoClient("mongodb://localhost:27017/")
+journal_collection = _client["sage_db"]["journal_entries"]
 
 DATE_FORMATS = ["%Y-%m-%d", "%Y-%m-%d %H:%M:%S", "%B %d, %Y"]
 
